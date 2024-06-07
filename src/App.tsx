@@ -1,35 +1,36 @@
 import React, { useEffect, useState } from 'react';
 
 const App: React.FC = () => {
-  // State to hold cookies
-  const [cookies, setCookies] = useState<any[]>([]);
+  // State to hold remaining likes
+  const [likes, setLikes] = useState<number | null>(null);
 
   useEffect(() => {
-    // Get the current tab URL
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-      const currentTab = tabs[0];
-      if (currentTab && currentTab.url) {
-        // Send a message to the background script to get cookies
-        chrome.runtime.sendMessage(
-          { action: 'getCookies', url: currentTab.url },
-          (response) => {
-            if (response && response.cookies) {
-              setCookies(response.cookies);
-            }
-          }
-        );
+    // Fetch initial likes from chrome.storage.sync
+    chrome.storage.sync.get(['badge'], (result) => {
+      if (result.badge !== undefined) {
+        setLikes(result.badge);
       }
     });
+
+    // Listen for messages from the content script
+    const messageListener = (message: any) => {
+      if (message.type === 'LIKES_UPDATE') {
+        setLikes(message.likes);
+      }
+    };
+
+    chrome.runtime.onMessage.addListener(messageListener);
+
+    // Clean up the listener on component unmount
+    return () => {
+      chrome.runtime.onMessage.removeListener(messageListener);
+    };
   }, []);
 
   return (
     <div>
-      <h1>Cookies</h1>
-      <ul>
-        {cookies.map((cookie, index) => (
-          <li key={index}>{cookie.name}: {cookie.value}</li>
-        ))}
-      </ul>
+      <h1>Remaining Likes</h1>
+      <p>{likes !== null ? likes : 'Loading...'}</p>
     </div>
   );
 };
