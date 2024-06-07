@@ -1,24 +1,29 @@
-import cssText from "data-text:~style.css"
-import type { PlasmoCSConfig } from "plasmo"
+import cssText from "data-text:~style.css";
+import type { PlasmoCSConfig, PlasmoGetInlineAnchor } from "plasmo";
 
-import { LikeCount } from "~components/like-count"
+import { LikeCount } from "~components/like-count";
 
 export const config: PlasmoCSConfig = {
-  matches: ["https://www.okcupid.com/*"]
-}
+  matches: ["https://www.okcupid.com/*"],
+};
 
 export const getStyle = () => {
-  const style = document.createElement("style")
-  style.textContent = cssText
-  return style
-}
+  const style = document.createElement("style");
+  style.textContent = cssText;
+  return style;
+};
+
+export const getInlineAnchor: PlasmoGetInlineAnchor = async () => ({
+  element: document.querySelector(".navbar-boost-button"),
+  insertPosition: "afterend",
+});
 
 const PlasmoOverlay = () => {
   return (
-    <div className="plasmo-z-50 plasmo-flex plasmo-fixed plasmo-top-32 plasmo-right-8">
+    <div className="plasmo-relative  plasmo-left-[10rem] plasmo-bottom-10">
       <LikeCount />
     </div>
-  )
-}
+  );
+};
 
-export default PlasmoOverlay
+export default PlasmoOverlay;

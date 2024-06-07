@@ -1,14 +1,14 @@
-import { useEffect, useState } from "react"
-
-import { useStorage } from "@plasmohq/storage/hook"
+import { useStorage } from "@plasmohq/storage/hook";
 
 export const LikeCount = () => {
-  const [likes] = useStorage("likes")
+  const [likes] = useStorage("likes");
 
   return (
     <div>
-      <h1>Remaining Likes</h1>
-      <p>{likes !== null ? likes : "Loading..."}</p>
+      <h1 className="plasmo-text-blue-400">Remaining Likes</h1>
+      <p className="plasmo-text-blue-400">
+        {likes !== null ? likes : "Loading..."}
+      </p>
     </div>
-  )
-}
+  );
+};
