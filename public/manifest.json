@@ -1,0 +1,23 @@
+{
+  "manifest_version": 3,
+  "name": "Auto Cupid",
+  "version": "1.0",
+  "description": "A Chrome extension built with React, Vite, and TypeScript.",
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "cookies",
+    "https://*/*",
+    "http://*/*"
+  ],
+  "action": {
+    "default_popup": "index.html"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "icons": {
+    "32": "icon.png"
+  },
+  "host_permissions": ["https://okcupid.com/*"]
+}

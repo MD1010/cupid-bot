@@ -1,35 +1,37 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React, { useEffect, useState } from 'react';
 
-function App() {
-  const [count, setCount] = useState(0)
+const App: React.FC = () => {
+  // State to hold cookies
+  const [cookies, setCookies] = useState<any[]>([]);
+
+  useEffect(() => {
+    // Get the current tab URL
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      const currentTab = tabs[0];
+      if (currentTab && currentTab.url) {
+        // Send a message to the background script to get cookies
+        chrome.runtime.sendMessage(
+          { action: 'getCookies', url: currentTab.url },
+          (response) => {
+            if (response && response.cookies) {
+              setCookies(response.cookies);
+            }
+          }
+        );
+      }
+    });
+  }, []);
 
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    <div>
+      <h1>Cookies</h1>
+      <ul>
+        {cookies.map((cookie, index) => (
+          <li key={index}>{cookie.name}: {cookie.value}</li>
+        ))}
+      </ul>
+    </div>
+  );
+};
 
-export default App
+export default App;
