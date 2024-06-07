@@ -6,9 +6,7 @@
   "permissions": [
     "activeTab",
     "scripting",
-    "cookies",
-    "https://*/*",
-    "http://*/*"
+    "cookies"
   ],
   "action": {
     "default_popup": "index.html"
@@ -16,6 +14,12 @@
   "background": {
     "service_worker": "background.js"
   },
+  "content_scripts": [
+    {
+      "matches": ["https://www.okcupid.com/home"], 
+      "js": ["content.js"]
+    }
+  ],
   "icons": {
     "32": "icon.png"
   },
