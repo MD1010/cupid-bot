@@ -11,6 +11,9 @@ node_modules
 dist
 dist-ssr
 *.local
+.plasmo
+.vite
+build
 
 # Editor directories and files
 .vscode/*
