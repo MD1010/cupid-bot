@@ -1,7 +1,8 @@
 import { useStorage } from "@plasmohq/storage/hook";
 import { RefreshIcon } from "hugeicons-react";
 import { useState } from "react";
-import { updateRemainingLikes } from "~contents/main";
+import { updateRemainingLikes } from '~services/likes';
+
 
 export const LikeCount = () => {
   const [likes] = useStorage("likes");
