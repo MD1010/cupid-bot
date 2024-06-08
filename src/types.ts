@@ -94,3 +94,33 @@ interface LikesCap {
   viewCount: number;
   __typename: string;
 }
+
+type DateStyle = "hookups" | "long" | "short" | "friends";
+type BodyStyle =
+  | "all"
+  | "thin"
+  | "fit"
+  | "average"
+  | "jacked"
+  | "curvy"
+  | "full figured"
+  | "a little extra"
+  | "overweight";
+
+type NumericRange = { from: number; to: number };
+
+export interface CupidFilter {
+  dateStyle?: DateStyle;
+  bodyStyle?: BodyStyle;
+  isStraight?: boolean;
+  isMonogamy?: boolean;
+  heightRange?: NumericRange;
+  filterIfHasWords?: string[];
+  onlyAcceptIfIncludeWords?: string[];
+  isReligious?: boolean;
+  isSmoking?: boolean;
+  isWeed?: boolean;
+  isDrinking?: boolean;
+  languages?: string[];
+  isJewish?: boolean;
+}

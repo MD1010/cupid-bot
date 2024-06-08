@@ -1,7 +1,6 @@
 import type { PlasmoCSConfig } from "plasmo";
 
 import { updateRemainingLikes } from "~services/likes";
-import { sendMessagesToRelevant } from "~services/matches";
 import { setCurrentUserId } from "~services/user";
 import { checkInitialLoaded } from "~utils/pageLoad";
 

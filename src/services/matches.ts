@@ -1,6 +1,6 @@
 import _, { uniqueId } from "lodash";
 import { getUserInfo } from "./user";
-import type { CupidUser } from "~types";
+import type { CupidFilter, CupidUser } from "~types";
 import { storage } from "~storage";
 import {
   MAX_LIKES_PER_DAY,
@@ -41,23 +41,24 @@ export const getUserPotentialMatches = async (
   return _.uniqBy(foundUsers, (user) => user.id);
 };
 
-const getFilteredMatches = (data: CupidUser[]) => {
+const getFilteredMatches = (data: CupidUser[], filters: CupidFilter[]) => {
   return data;
 };
 
 export const sendMessagesToRelevant = async (
   messageToSend: string,
-  maxSendTo?: number
+  maxSendTo?: number,
+  filters: CupidFilter[] = []
 ) => {
   let maxPotentialMatchesToFetch = maxSendTo
     ? maxSendTo
     : await getRemainingLikes();
   const sentIds = new Set();
-  await storage.setItem(STORAGE_KEYS.sentAmount, 0)
+  await storage.setItem(STORAGE_KEYS.sentAmount, 0);
 
   while (maxPotentialMatchesToFetch > 0) {
     const allUsers = await getUserPotentialMatches(maxPotentialMatchesToFetch);
-    const filteredUsers = getFilteredMatches(allUsers);
+    const filteredUsers = getFilteredMatches(allUsers, filters);
 
     console.log("filteredUsers", filteredUsers);
 
@@ -76,5 +77,4 @@ export const sendMessagesToRelevant = async (
     maxPotentialMatchesToFetch -= sentIds.size;
   }
   console.log("done sent to: ", sentIds);
-
 };
