@@ -16,8 +16,9 @@ export const OPERATIONS = {
 export const STORAGE_KEYS = {
   likes: "likes",
   currentUserId: "currentUserId",
-  sentUserIds: 'sentUserIds'
+  sentAmount: "sentAmount",
 };
 
 export const DEFAULT_MESSAGE = "היי :)";
 export const MAX_LIKES_PER_DAY = 3;
+export const SLEEP_TIME_BETWEEN_SENDS = 2_000

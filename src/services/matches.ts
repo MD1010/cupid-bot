@@ -2,9 +2,16 @@ import _, { uniqueId } from "lodash";
 import { getUserInfo } from "./user";
 import type { CupidUser } from "~types";
 import { storage } from "~storage";
-import { MAX_LIKES_PER_DAY, STORAGE_KEYS } from "~consts";
+import {
+  MAX_LIKES_PER_DAY,
+  SLEEP_TIME_BETWEEN_SENDS,
+  STORAGE_KEYS,
+} from "~consts";
 import { sendMessage } from "~api/message";
 import { randomUUID } from "crypto";
+import { userInfo } from "os";
+import { getRemainingLikes } from "~api/likes";
+import { sleep } from "~utils/time";
 
 const STACKS_TO_IGNORE = ["PENPAL"];
 
@@ -38,16 +45,15 @@ const getFilteredMatches = (data: CupidUser[]) => {
   return data;
 };
 
-export const sendMessagesToRelevant = async (messageToSend: string) => {
-  let maxPotentialMatchesToFetch = +(await storage.get(STORAGE_KEYS.likes));
-  // let maxPotentialMatchesToFetch = 2;
-  const alreadySentIds: string[] = JSON.parse(
-    await storage.get(STORAGE_KEYS.sentUserIds)
-  );
-
-  const sentUserIds = alreadySentIds.length
-    ? new Set(alreadySentIds)
-    : new Set();
+export const sendMessagesToRelevant = async (
+  messageToSend: string,
+  maxSendTo?: number
+) => {
+  let maxPotentialMatchesToFetch = maxSendTo
+    ? maxSendTo
+    : await getRemainingLikes();
+  const sentIds = new Set();
+  await storage.setItem(STORAGE_KEYS.sentAmount, 0)
 
   while (maxPotentialMatchesToFetch > 0) {
     const allUsers = await getUserPotentialMatches(maxPotentialMatchesToFetch);
@@ -56,14 +62,19 @@ export const sendMessagesToRelevant = async (messageToSend: string) => {
     console.log("filteredUsers", filteredUsers);
 
     for (const user of filteredUsers) {
-      if (!sentUserIds.has(user.id)) {
+      if (!sentIds.has(user.id)) {
         console.log("sending...");
-        await sendMessage(user.id, messageToSend);
-        sentUserIds.add(user.id);
+        const prevAmountSent = await storage.getItem(STORAGE_KEYS.sentAmount);
+        // await sendMessage(user.id, messageToSend);
+        await storage.setItem(STORAGE_KEYS.sentAmount, prevAmountSent + 1);
+        console.log("sleeping...");
+        await sleep(SLEEP_TIME_BETWEEN_SENDS);
+        sentIds.add(user.id);
       }
     }
 
-    maxPotentialMatchesToFetch -= sentUserIds.size;
+    maxPotentialMatchesToFetch -= sentIds.size;
   }
-  console.log("done - sent to:", sentUserIds);
+  console.log("done sent to: ", sentIds);
+
 };

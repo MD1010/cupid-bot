@@ -14,6 +14,5 @@ export const config: PlasmoCSConfig = {
   if (checkInitialLoaded()) {
     await setCurrentUserId();
     await updateRemainingLikes();
-    await sendMessagesToRelevant("היי");
   }
 })();
