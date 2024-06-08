@@ -20,7 +20,7 @@ export const getInlineAnchor: PlasmoGetInlineAnchor = async () => ({
 
 const PlasmoOverlay = () => {
   return (
-    <div className="plasmo-relative  plasmo-left-[10rem] plasmo-bottom-10">
+    <div className="plasmo-fixed plasmo-right-[10rem] plasmo-bottom-10">
       <LikeCount />
     </div>
   );
