@@ -3,7 +3,7 @@ import { CUPID_BASE_GQL_URL } from '~consts';
 
 
 type CupidGQLBody = {
-  operationName: "WebGetUserGuide" | "WebStacksMenu" | "WebConversationMessageSend";
+  operationName: "WebGetUserGuide" | "WebStacksMenu" | "WebConversationMessageSend" | "WebUserVote";
   variables: {};
   query: string;
 };

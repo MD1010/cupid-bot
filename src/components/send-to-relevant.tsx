@@ -14,7 +14,7 @@ export const SendToRelevant = () => {
       disabled={isSendingInProgress}
       onClick={async () => {
         setIsSendingInProgress(true);
-        await sendMessagesToRelevant(message);
+        await sendMessagesToRelevant(message, 1);
         setIsSendingInProgress(false);
       }}
     >

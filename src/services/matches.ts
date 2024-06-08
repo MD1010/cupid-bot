@@ -10,7 +10,7 @@ import {
 import { sendMessage } from "~api/message";
 import { randomUUID } from "crypto";
 import { userInfo } from "os";
-import { getRemainingLikes } from "~api/likes";
+import { getRemainingLikes, sendUserPass } from "~api/likes";
 import { sleep } from "~utils/time";
 
 const STACKS_TO_IGNORE = ["PENPAL"];
@@ -18,6 +18,7 @@ const STACKS_TO_IGNORE = ["PENPAL"];
 export const getUserPotentialMatches = async (
   maxPotentialMatchesToFetch: number
 ) => {
+  const userToStreamMap = new Map<string, string>();
   console.log("getting potential matches...");
 
   const foundUsers: CupidUser[] = [];
@@ -35,13 +36,28 @@ export const getUserPotentialMatches = async (
         foundUsers.length < maxPotentialMatchesToFetch
       ) {
         foundUsers.push(potentialMatch.match.user);
+        userToStreamMap.set(
+          potentialMatch.match.user.id,
+          potentialMatch.stream
+        );
       }
     }
   }
-  return _.uniqBy(foundUsers, (user) => user.id);
+
+  return {
+    foundUsers: _.uniqBy(foundUsers, (user) => user.id),
+    userToStreamMap,
+  };
 };
 
-const getFilteredMatches = (data: CupidUser[], filters: CupidFilter[]) => {
+const filterMatches = async (
+  data: CupidUser[],
+  userToStreamMap: Map<string, string>,
+  filters: CupidFilter[]
+) => {
+  // send pass on users that are not in the filter
+  // await sendUserPass(data[0].id, userToStreamMap.get(data[0].id))
+  
   return data;
 };
 
@@ -57,8 +73,10 @@ export const sendMessagesToRelevant = async (
   await storage.setItem(STORAGE_KEYS.sentAmount, 0);
 
   while (maxPotentialMatchesToFetch > 0) {
-    const allUsers = await getUserPotentialMatches(maxPotentialMatchesToFetch);
-    const filteredUsers = getFilteredMatches(allUsers, filters);
+    const { foundUsers, userToStreamMap } = await getUserPotentialMatches(
+      maxPotentialMatchesToFetch
+    );
+    const filteredUsers = await filterMatches(foundUsers, userToStreamMap, filters);
 
     console.log("filteredUsers", filteredUsers);
 
