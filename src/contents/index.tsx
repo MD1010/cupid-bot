@@ -2,6 +2,8 @@ import cssText from "data-text:~style.css";
 import type { PlasmoCSConfig, PlasmoGetInlineAnchor } from "plasmo";
 
 import { LikeCount } from "~components/like-count";
+import { updateRemainingLikes } from "./main";
+import { useState } from "react";
 
 export const config: PlasmoCSConfig = {
   matches: ["https://www.okcupid.com/*"],

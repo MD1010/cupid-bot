@@ -8,13 +8,15 @@ export const config: PlasmoCSConfig = {
   matches: ["https://www.okcupid.com/*"],
   all_frames: true,
 };
+const storage = new Storage();
 
-(async () => {
+export const updateRemainingLikes = async () => {
   try {
-    const storage = new Storage();
     const likes = await getRemainingLikes();
+    
     await storage.set(STORAGE_KEYS.likes, likes);
+    console.log("likes refreshed", likes);
   } catch (error) {
     console.error(error);
   }
-})();
+};

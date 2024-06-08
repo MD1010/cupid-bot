@@ -1,10 +1,10 @@
-import { fetchCupidAPI } from "~utils/cupidrRequest";
+import { fetchCupidAPI } from "~utils/cupidRequest";
 import { getCurrentUserId } from "./user";
 import { QUERIES } from "~consts";
 
 const getRemainingLikes = async () => {
   const currentUserId = await getCurrentUserId();
-  console.log("current user id ", currentUserId);
+  
 
   const data = await fetchCupidAPI({
     data: {
