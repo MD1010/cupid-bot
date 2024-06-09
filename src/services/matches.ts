@@ -6,6 +6,7 @@ import type { CupidFilters, Match } from "~types";
 import { sleep } from "~utils/time";
 import { getUserInfo } from "./user";
 import { getRelevantMatchesByFilters } from "./filters";
+import { sendMessage } from '~api/message';
 
 const STACKS_TO_IGNORE = ["PENPAL"];
 
@@ -94,7 +95,7 @@ export const sendMessagesToRelevant = async (
 
     for (const { user } of filteredMatches) {
       if (!sentIds.has(user.id)) {
-        console.log("sending...");
+        console.log(`sending message to ${user.id}`);
         const prevAmountSent = await storage.getItem(STORAGE_KEYS.sentAmount);
         // await sendMessage(user.id, messageToSend);
         await storage.setItem(STORAGE_KEYS.sentAmount, prevAmountSent + 1);
