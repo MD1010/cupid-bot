@@ -69,13 +69,13 @@ export const sendMessagesToRelevant = async (
   maxSendTo?: number,
   filters?: CupidFilters
 ) => {
+  await storage.setItem(STORAGE_KEYS.sentAmount, 0);
   let maxPotentialMatchesToFetch = maxSendTo
     ? maxSendTo
     : await getRemainingLikes();
 
   let fetchRetries = MAX_RETRIES;
   const sentIds = new Set();
-  await storage.setItem(STORAGE_KEYS.sentAmount, 0);
 
   while (maxPotentialMatchesToFetch > 0 && fetchRetries > 0) {
     fetchRetries -= 1;
