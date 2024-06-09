@@ -5,7 +5,6 @@ import {
   STORAGE_KEYS,
 } from "~consts";
 import { storage } from "~storage";
-import type { CupidUser } from "~types";
 import { fetchCupidAPI } from "~utils/cupidRequest";
 
 export const sendMessage = async (

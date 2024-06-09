@@ -23,4 +23,5 @@ export const STORAGE_KEYS = {
 
 export const DEFAULT_MESSAGE = "היי :)";
 export const MAX_LIKES_PER_DAY = 3;
-export const SLEEP_TIME_BETWEEN_SENDS = 2_000;
+export const MAX_RETRIES = 3;
+export const SLEEP_TIME_BETWEEN_SENDS = 500;

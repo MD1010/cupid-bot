@@ -29,17 +29,6 @@ interface StreamMatch {
   match: Match;
   __typename: string;
 }
-interface Match {
-  senderLikes: boolean;
-  senderPassed: boolean;
-  firstMessage?: any;
-  __typename: string;
-  matchPercent: number;
-  targetLikes: boolean;
-  targetMessageTime?: any;
-  targetLikeViaSpotlight: boolean;
-  user: CupidUser;
-}
 
 export interface CupidUser {
   id: string;
@@ -53,7 +42,7 @@ export interface CupidUser {
   detailSentences: DetailSentence[];
   __typename: string;
 }
-interface Match {
+export interface Match {
   senderLikes: boolean;
   senderPassed: boolean;
   firstMessage?: any;
@@ -65,7 +54,7 @@ interface Match {
   user: CupidUser;
 }
 
-interface DetailSentence {
+export interface DetailSentence {
   name: string;
   text: string;
   __typename: string;
@@ -95,22 +84,24 @@ interface LikesCap {
   __typename: string;
 }
 
-type DateStyle = "hookups" | "long" | "short" | "friends";
-type BodyStyle =
+// export type DateStyle = "hookups" | "long" | "short" | "friends";
+export type BodyStyle =
   | "all"
-  | "thin"
-  | "fit"
-  | "average"
-  | "jacked"
+  | "Thin"
+  | "Fit"
+  | "Average"
+  | "Jacked"
   | "curvy"
   | "full figured"
-  | "a little extra"
-  | "overweight";
+  | "A little extra"
+  | "Overweight";
 
-type NumericRange = { from: number; to: number };
+export type NumericRange = { from: number; to: number };
 
-export interface CupidFilter {
-  dateStyle?: DateStyle;
+export type EmploymentType = "Full-Time" | "Part-time" | "Unemployed";
+
+export interface CupidFilters {
+  // dateStyle?: DateStyle;
   bodyStyle?: BodyStyle;
   isStraight?: boolean;
   isMonogamy?: boolean;
@@ -123,4 +114,8 @@ export interface CupidFilter {
   isDrinking?: boolean;
   languages?: string[];
   isJewish?: boolean;
+  educationLevel?: string[];
+  employmentStatus?: EmploymentType[];
+  minMatchPercentage?: number;
+  isMutualLike?: boolean;
 }

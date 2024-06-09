@@ -1,17 +1,11 @@
-import _, { uniqueId } from "lodash";
-import { getUserInfo } from "./user";
-import type { CupidFilter, CupidUser } from "~types";
-import { storage } from "~storage";
-import {
-  MAX_LIKES_PER_DAY,
-  SLEEP_TIME_BETWEEN_SENDS,
-  STORAGE_KEYS,
-} from "~consts";
-import { sendMessage } from "~api/message";
-import { randomUUID } from "crypto";
-import { userInfo } from "os";
+import _ from "lodash";
 import { getRemainingLikes, sendUserPass } from "~api/likes";
+import { MAX_RETRIES, SLEEP_TIME_BETWEEN_SENDS, STORAGE_KEYS } from "~consts";
+import { storage } from "~storage";
+import type { CupidFilters, Match } from "~types";
 import { sleep } from "~utils/time";
+import { getUserInfo } from "./user";
+import { getRelevantMatchesByFilters } from "./filters";
 
 const STACKS_TO_IGNORE = ["PENPAL"];
 
@@ -21,7 +15,7 @@ export const getUserPotentialMatches = async (
   const userToStreamMap = new Map<string, string>();
   console.log("getting potential matches...");
 
-  const foundUsers: CupidUser[] = [];
+  const foundMatches: Match[] = [];
   const info = await getUserInfo();
 
   const allStacks = info.data.user.stacks;
@@ -33,9 +27,9 @@ export const getUserPotentialMatches = async (
     for (const potentialMatch of potentialMatches) {
       if (
         potentialMatch.match?.user &&
-        foundUsers.length < maxPotentialMatchesToFetch
+        foundMatches.length < maxPotentialMatchesToFetch
       ) {
-        foundUsers.push(potentialMatch.match.user);
+        foundMatches.push(potentialMatch.match);
         userToStreamMap.set(
           potentialMatch.match.user.id,
           potentialMatch.stream
@@ -45,42 +39,60 @@ export const getUserPotentialMatches = async (
   }
 
   return {
-    foundUsers: _.uniqBy(foundUsers, (user) => user.id),
+    foundMatches: _.uniqBy(foundMatches, (match) => match.user.id),
     userToStreamMap,
   };
 };
 
 const filterMatches = async (
-  data: CupidUser[],
+  matches: Match[],
   userToStreamMap: Map<string, string>,
-  filters: CupidFilter[]
+  filters: CupidFilters
 ) => {
-  // send pass on users that are not in the filter
-  // await sendUserPass(data[0].id, userToStreamMap.get(data[0].id))
-  
-  return data;
+  const passed = getRelevantMatchesByFilters(matches, filters);
+  const notPassed = _.difference(matches, passed);
+  console.log("passed", passed);
+  console.log("not passed", notPassed);
+
+  for (const match of notPassed) {
+    console.log("sending pass on ", match.user.id)
+    // await sendUserPass(match.user.id, userToStreamMap.get(match.user.id));
+    console.log("sleeping on user pass..");
+    await sleep(SLEEP_TIME_BETWEEN_SENDS);
+  }
+
+  return passed;
 };
 
 export const sendMessagesToRelevant = async (
   messageToSend: string,
   maxSendTo?: number,
-  filters: CupidFilter[] = []
+  filters?: CupidFilters
 ) => {
   let maxPotentialMatchesToFetch = maxSendTo
     ? maxSendTo
     : await getRemainingLikes();
+
+  let fetchRetries = MAX_RETRIES;
   const sentIds = new Set();
   await storage.setItem(STORAGE_KEYS.sentAmount, 0);
 
-  while (maxPotentialMatchesToFetch > 0) {
-    const { foundUsers, userToStreamMap } = await getUserPotentialMatches(
+  while (maxPotentialMatchesToFetch > 0 && fetchRetries > 0) {
+    fetchRetries -= 1;
+    const { foundMatches, userToStreamMap } = await getUserPotentialMatches(
       maxPotentialMatchesToFetch
     );
-    const filteredUsers = await filterMatches(foundUsers, userToStreamMap, filters);
+    const filteredMatches = await filterMatches(
+      foundMatches,
+      userToStreamMap,
+      filters
+    );
 
-    console.log("filteredUsers", filteredUsers);
+    console.log("filteredMatches", filteredMatches);
 
-    for (const user of filteredUsers) {
+    if (!filterMatches.length) continue;
+
+    for (const { user } of filteredMatches) {
       if (!sentIds.has(user.id)) {
         console.log("sending...");
         const prevAmountSent = await storage.getItem(STORAGE_KEYS.sentAmount);

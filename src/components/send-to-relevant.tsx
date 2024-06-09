@@ -14,7 +14,9 @@ export const SendToRelevant = () => {
       disabled={isSendingInProgress}
       onClick={async () => {
         setIsSendingInProgress(true);
-        await sendMessagesToRelevant(message, 1);
+        await sendMessagesToRelevant(message, null, {
+          heightRange: { from: 155, to: 170 },
+        });
         setIsSendingInProgress(false);
       }}
     >
