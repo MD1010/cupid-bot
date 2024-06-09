@@ -118,4 +118,5 @@ export interface CupidFilters {
   employmentStatus?: EmploymentType[];
   minMatchPercentage?: number;
   isMutualLike?: boolean;
+  hasKids?: boolean;
 }

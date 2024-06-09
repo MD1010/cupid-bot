@@ -4,7 +4,7 @@ import type {
   CupidUser,
   EmploymentType,
   Match,
-  NumericRange
+  NumericRange,
 } from "~types";
 import { getDetail, getHeight, hasWords } from "~utils/filters";
 
@@ -20,7 +20,10 @@ function filterByMonogamy(user: CupidUser, isMonogamy: boolean): boolean {
 
 function filterByHeight(user: CupidUser, heightRange: NumericRange): boolean {
   const height = getHeight(user.detailSentences);
-  return !height || height && height >= heightRange.from && height <= heightRange.to;
+  return (
+    !height ||
+    (height && height >= heightRange.from && height <= heightRange.to)
+  );
 }
 
 function filterByExcludeWords(
@@ -119,7 +122,6 @@ function filterByBodyStyle(user: CupidUser, bodyStyle: BodyStyle): boolean {
   );
 }
 
-
 function filterByMinMatchPercentage(
   match: Match,
   minMatchPercentage: number
@@ -131,7 +133,19 @@ function filterByMutualLike(match: Match): boolean {
   return match.targetLikes;
 }
 
-export function getRelevantMatchesByFilters(matches: Match[], filters: CupidFilters): Match[] {
+function filterByHasKids(user: CupidUser, hasKids: boolean): boolean {
+  const family = getDetail(user.detailSentences, "family");
+
+  return (
+    (hasKids && family.includes("Has kid")) ||
+    (!hasKids && !family.includes("Has kid"))
+  );
+}
+
+export function getRelevantMatchesByFilters(
+  matches: Match[],
+  filters: CupidFilters
+): Match[] {
   return matches.filter((match) => {
     const user = match.user;
 
@@ -199,6 +213,12 @@ export function getRelevantMatchesByFilters(matches: Match[], filters: CupidFilt
     )
       return false;
     if (filters.isMutualLike !== undefined && !filterByMutualLike(match))
+      return false;
+
+    if (
+      filters.hasKids !== undefined &&
+      !filterByHasKids(match.user, filters.hasKids)
+    )
       return false;
     return true;
   });

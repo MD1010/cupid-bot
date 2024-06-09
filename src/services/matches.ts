@@ -21,6 +21,9 @@ export const getUserPotentialMatches = async (
 
   const allStacks = info.data.user.stacks;
 
+  console.log('all stacks', allStacks);
+  
+
   for (const stack of allStacks) {
     if (STACKS_TO_IGNORE.includes(stack.id)) continue;
 
