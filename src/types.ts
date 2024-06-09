@@ -98,7 +98,7 @@ export type BodyStyle =
 
 export type NumericRange = { from: number; to: number };
 
-export type EmploymentType = "Full-Time" | "Part-time" | "Unemployed";
+export type EmploymentType = "Full-Time" | "Part-time" | "Unemployed" | "Self-employed";
 
 export interface CupidFilters {
   // dateStyle?: DateStyle;
