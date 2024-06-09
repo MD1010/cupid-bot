@@ -25,3 +25,19 @@ export const DEFAULT_MESSAGE = "היי :)";
 export const MAX_LIKES_PER_DAY = 3;
 export const MAX_RETRIES = 3;
 export const SLEEP_TIME_BETWEEN_SENDS = 500;
+
+export const RELIGIOUS_RESERVED_WORDS = [
+  "שבת",
+  "שומרת שבת",
+  "מסורת",
+  "מסורתית",
+  "דתייה",
+  "דתיה",
+  "כשר",
+  "religion",
+  "religious",
+  "kosher",
+];
+
+export const EMPLOYED_STATUSES = ["Full-Time", "Part-time", "Self-employed"];
+export const FAT_BODY_TYPES = ["Jacked", "curvy", "full figured", "A little extra"];

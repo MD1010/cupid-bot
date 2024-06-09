@@ -6,7 +6,8 @@ import { sendMessagesToRelevant } from "~services/matches";
 export const SendToRelevant = () => {
   const [isSendingInProgress, setIsSendingInProgress] = useState(false);
   const [progress] = useStorage(STORAGE_KEYS.sentAmount);
-  const message = "האמת שהתלבטתי קצת מה לשלוח לך, ובסוף החלטתי ללכת עם האינטואיציה שלי שאת תעריכי הודעה אותנטית וישירה, ואומר שפשוט התחשק לי להכיר אותך 😊";
+  const message =
+    "האמת שהתלבטתי קצת מה לשלוח לך, ובסוף החלטתי ללכת עם האינטואיציה שלי שאת תעריכי הודעה אותנטית וישירה, ואומר שפשוט התחשק לי להכיר אותך 😊";
 
   return (
     <button
@@ -14,8 +15,15 @@ export const SendToRelevant = () => {
       disabled={isSendingInProgress}
       onClick={async () => {
         setIsSendingInProgress(true);
-        await sendMessagesToRelevant(message, 3, {
-          heightRange: { from: 155, to: 170 },
+        await sendMessagesToRelevant({
+          passIfNotSpecified: false,
+          messageToSend: message,
+          filters: {
+            isNotSemitrailer: true,
+            heightRange: { from: 155, to: 170 },
+            isWeed: false,
+            isSmoking: false,
+          },
         });
         setIsSendingInProgress(false);
       }}

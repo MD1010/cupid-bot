@@ -84,25 +84,10 @@ interface LikesCap {
   __typename: string;
 }
 
-// export type DateStyle = "hookups" | "long" | "short" | "friends";
-export type BodyStyle =
-  | "all"
-  | "Thin"
-  | "Fit"
-  | "Average"
-  | "Jacked"
-  | "curvy"
-  | "full figured"
-  | "A little extra"
-  | "Overweight";
-
 export type NumericRange = { from: number; to: number };
 
-export type EmploymentType = "Full-Time" | "Part-time" | "Unemployed" | "Self-employed";
-
 export interface CupidFilters {
-  // dateStyle?: DateStyle;
-  bodyStyle?: BodyStyle;
+  isNotSemitrailer?: boolean;
   isStraight?: boolean;
   isMonogamy?: boolean;
   heightRange?: NumericRange;
@@ -114,8 +99,8 @@ export interface CupidFilters {
   isDrinking?: boolean;
   languages?: string[];
   isJewish?: boolean;
-  educationLevel?: string[];
-  employmentStatus?: EmploymentType[];
+  isEducated?: boolean;
+  isEmployed?: boolean;
   minMatchPercentage?: number;
   isMutualLike?: boolean;
   hasKids?: boolean;

@@ -11,7 +11,8 @@ function getHeight(details: DetailSentence[]): number | null {
 }
 
 function hasWords(content: string, words: string[]): boolean {
-  return words.some((word) => content.includes(word));
+  const lowerCaseContent = content.toLowerCase();
+  return words.some((word) => lowerCaseContent.includes(word.toLowerCase()));
 }
 
 export { getDetail, getHeight, hasWords };
