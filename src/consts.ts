@@ -19,6 +19,7 @@ export const STORAGE_KEYS = {
   likes: "likes",
   currentUserId: "currentUserId",
   foundMatches: "foundMatches",
+  sentAmount: "sentAmount",
 };
 
 export const DEFAULT_MESSAGE = "היי :)";

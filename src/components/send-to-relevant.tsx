@@ -1,14 +1,19 @@
 import { useStorage } from "@plasmohq/storage/hook";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { MAX_RETRIES, STORAGE_KEYS } from "~consts";
 import { sendMessagesToRelevant } from "~services/matches";
 
 export const SendToRelevant = () => {
   const [isSendingInProgress, setIsSendingInProgress] = useState(false);
   const [foundMatches] = useStorage(STORAGE_KEYS.foundMatches);
+  const [sentAmount] = useStorage(STORAGE_KEYS.sentAmount);
   const [totalMatchesSent, setTotalMatchesSent] = useState<number>(0);
   const message =
     "האמת שהתלבטתי קצת מה לשלוח לך, ובסוף החלטתי ללכת עם האינטואיציה שלי שאת תעריכי הודעה אותנטית וישירה, ואומר שפשוט התחשק לי להכיר אותך 😊";
+
+  useEffect(() => {
+    sentAmount && setTotalMatchesSent((prevCount) => prevCount += 1);
+  }, [sentAmount]);
 
   return (
     <>
@@ -18,7 +23,7 @@ export const SendToRelevant = () => {
         onClick={async () => {
           for (let i = 0; i < MAX_RETRIES; i++) {
             setIsSendingInProgress(true);
-            const newMatchesSent = await sendMessagesToRelevant({
+            await sendMessagesToRelevant({
               passIfNotSpecified: false,
               messageToSend: message,
               filters: {
@@ -29,7 +34,7 @@ export const SendToRelevant = () => {
                 // languages: ["russian"]
               },
             });
-            setTotalMatchesSent((prevCount) => prevCount + newMatchesSent);
+
             setIsSendingInProgress(false);
           }
         }}
@@ -44,7 +49,7 @@ export const SendToRelevant = () => {
         )}
       </button>
 
-      {totalMatchesSent && <div className='plasmo-text-blue-600'>Total sent: {totalMatchesSent}</div>}
+      <div className="plasmo-text-blue-600">Total sent: {totalMatchesSent}</div>
     </>
   );
 };

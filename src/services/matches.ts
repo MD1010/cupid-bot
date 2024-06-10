@@ -81,6 +81,7 @@ export const sendMessagesToRelevant = async ({
     : await getRemainingLikes();
 
   const seenIds = new Set();
+  let numOfSent = 0;
 
   const { foundMatches, userToStreamMap } = await getUserPotentialMatches(
     maxPotentialMatchesToFetch
@@ -94,22 +95,24 @@ export const sendMessagesToRelevant = async ({
 
   if (!passedMatches.size) return;
 
-  storage.setItem(STORAGE_KEYS.foundMatches, passedMatches.size);
+  await storage.setItem(STORAGE_KEYS.foundMatches, passedMatches.size);
+  await storage.setItem(STORAGE_KEYS.sentAmount, 0);
 
   for (const { user } of foundMatches) {
     if (seenIds.has(user.id)) continue;
     if (passedMatches.get(user.id)) {
       console.log(`✅ ${user.id}`);
-      // await sendMessage(user.id, messageToSend);
+      await sendMessage(user.id, messageToSend);
+      numOfSent += 1;
+      await storage.setItem(STORAGE_KEYS.sentAmount, numOfSent);
     } else {
       console.log("❌", user.id);
-      // await sendUserPass(user.id, userToStreamMap.get(user.id));
+      await sendUserPass(user.id, userToStreamMap.get(user.id));
     }
     seenIds.add(user.id);
     console.log("💤");
 
     await sleep(SLEEP_TIME_BETWEEN_SENDS);
   }
-  console.log(`DONE sent to ${passedMatches.size} new matches`)
-  return passedMatches.size;
+  console.log(`DONE sent to ${passedMatches.size} new matches`);
 };
