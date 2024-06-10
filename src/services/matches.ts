@@ -49,7 +49,6 @@ export const getUserPotentialMatches = async (
 
 const filterMatches = async (
   matches: Match[],
-  userToStreamMap: Map<string, string>,
   filters: CupidFilters,
   ignoreIfNotSpcified: boolean
 ) => {
@@ -58,18 +57,12 @@ const filterMatches = async (
     filters,
     ignoreIfNotSpcified
   );
-  const notPassed = _.difference(matches, passed);
-  console.log("passed", passed);
-  console.log("not passed", notPassed);
-
-  for (const match of notPassed) {
-    console.log("❌", match.user.id);
-    // await sendUserPass(match.user.id, userToStreamMap.get(match.user.id));
-    console.log("💤");
-    await sleep(SLEEP_TIME_BETWEEN_SENDS);
+  const passedMap = new Map();
+  for (const passedMatch of passed) {
+    passedMap.set(passedMatch.user.id, passedMatch);
   }
 
-  return passed;
+  return passedMap;
 };
 
 export const sendMessagesToRelevant = async ({
@@ -83,42 +76,40 @@ export const sendMessagesToRelevant = async ({
   filters?: CupidFilters;
   passIfNotSpecified: boolean;
 }) => {
-  await storage.setItem(STORAGE_KEYS.sentAmount, 0);
-
   let maxPotentialMatchesToFetch = maxSendTo
     ? maxSendTo
     : await getRemainingLikes();
 
-  let fetchRetries = MAX_RETRIES;
-  const sentIds = new Set();
+  const seenIds = new Set();
 
-  while (maxPotentialMatchesToFetch > 0 && fetchRetries > 0) {
-    fetchRetries -= 1;
-    const { foundMatches, userToStreamMap } = await getUserPotentialMatches(
-      maxPotentialMatchesToFetch
-    );
-    const filteredMatches = await filterMatches(
-      foundMatches,
-      userToStreamMap,
-      filters,
-      passIfNotSpecified
-    );
+  const { foundMatches, userToStreamMap } = await getUserPotentialMatches(
+    maxPotentialMatchesToFetch
+  );
 
-    if (!filterMatches.length) continue;
+  const passedMatches = await filterMatches(
+    foundMatches,
+    filters,
+    passIfNotSpecified
+  );
 
-    for (const { user } of filteredMatches) {
-      if (!sentIds.has(user.id)) {
-        console.log(`✅ ${user.id}`);
-        const prevAmountSent = await storage.getItem(STORAGE_KEYS.sentAmount);
-        // await sendMessage(user.id, messageToSend);
-        await storage.setItem(STORAGE_KEYS.sentAmount, prevAmountSent + 1);
-        console.log("💤");
-        await sleep(SLEEP_TIME_BETWEEN_SENDS);
-        sentIds.add(user.id);
-      }
+  if (!passedMatches.size) return;
+
+  storage.setItem(STORAGE_KEYS.foundMatches, passedMatches.size);
+
+  for (const { user } of foundMatches) {
+    if (seenIds.has(user.id)) continue;
+    if (passedMatches.get(user.id)) {
+      console.log(`✅ ${user.id}`);
+      // await sendMessage(user.id, messageToSend);
+    } else {
+      console.log("❌", user.id);
+      // await sendUserPass(user.id, userToStreamMap.get(user.id));
     }
+    seenIds.add(user.id);
+    console.log("💤");
 
-    maxPotentialMatchesToFetch -= sentIds.size;
+    await sleep(SLEEP_TIME_BETWEEN_SENDS);
   }
-  console.log("done sent to: ", sentIds);
+  console.log(`DONE sent to ${passedMatches.size} new matches`)
+  return passedMatches.size;
 };

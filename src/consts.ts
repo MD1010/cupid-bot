@@ -18,12 +18,12 @@ export const OPERATIONS = {
 export const STORAGE_KEYS = {
   likes: "likes",
   currentUserId: "currentUserId",
-  sentAmount: "sentAmount",
+  foundMatches: "foundMatches",
 };
 
 export const DEFAULT_MESSAGE = "היי :)";
 export const MAX_LIKES_PER_DAY = 3;
-export const MAX_RETRIES = 3;
+export const MAX_RETRIES = 1;
 export const SLEEP_TIME_BETWEEN_SENDS = 500;
 
 export const RELIGIOUS_RESERVED_WORDS = [
