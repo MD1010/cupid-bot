@@ -43,7 +43,7 @@ export const SendToRelevant = () => {
           "Send to relevant"
         ) : (
           <div>
-            <div>Working on that, soon you will go on a date :)</div>
+            <div>Working on that :)</div>
             {foundMatches && <div>Found {foundMatches} new matches</div>}
           </div>
         )}
