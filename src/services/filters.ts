@@ -1,52 +1,47 @@
 import {
   EMPLOYED_STATUSES,
   FAT_BODY_TYPES,
-  RELIGIOUS_RESERVED_WORDS
+  RELIGIOUS_RESERVED_WORDS,
 } from "~consts";
-import type {
-  CupidFilters,
-  CupidUser,
-  Match,
-  NumericRange
-} from "~types";
+import type { CupidFilters, CupidUser, Match, NumericRange } from "~types";
 import { getDetail, getHeight, hasWords } from "~utils/filters";
 
 function filterByOrientation(
   user: CupidUser,
   isStraight: boolean,
   passIfNotSpecified: boolean
-): boolean {
+): [boolean, string] {
   const orientation = getDetail(user.detailSentences, "basics");
-  if (passIfNotSpecified && !orientation) return true;
-  return orientation.includes("Straight") === isStraight;
+  if (passIfNotSpecified && !orientation) return [true, ""];
+  const result = orientation.includes("Straight") === isStraight;
+  return [result, result ? "" : "Orientation mismatch"];
 }
 
 function filterByMonogamy(
   user: CupidUser,
   isMonogamy: boolean,
   passIfNotSpecified: boolean
-): boolean {
+): [boolean, string] {
   const monogamy = getDetail(user.detailSentences, "basics");
-  if (passIfNotSpecified && !monogamy) return true;
-  return monogamy.includes("Monogamous") === isMonogamy;
+  if (passIfNotSpecified && !monogamy) return [true, ""];
+  const result = monogamy.includes("Monogamous") === isMonogamy;
+  return [result, result ? "" : "Monogamy mismatch"];
 }
 
 function filterByHeight(
   user: CupidUser,
-  heightRange: NumericRange,
-): boolean {
+  heightRange: NumericRange
+): [boolean, string] {
   const height = getHeight(user.detailSentences);
-  if (!height) return true;
-  return (
-    !height ||
-    (height && height >= heightRange.from && height <= heightRange.to)
-  );
+  if (!height) return [true, ""];
+  const result = height >= heightRange.from && height <= heightRange.to;
+  return [result, result ? "" : "Height mismatch"];
 }
 
 function filterByExcludeWords(
   user: CupidUser,
   excludeWords: string[]
-): boolean {
+): [boolean, string] {
   const basics = getDetail(user.detailSentences, "basics") || "";
   const looks = getDetail(user.detailSentences, "looks") || "";
   const background = getDetail(user.detailSentences, "background") || "";
@@ -62,13 +57,14 @@ function filterByExcludeWords(
     ...user.essaysWithUniqueIds.map((essay) => essay.processedContent),
   ].join(" ");
 
-  return !hasWords(allText, excludeWords);
+  const result = !hasWords(allText, excludeWords);
+  return [result, result ? "" : "Contains excluded words"];
 }
 
 function filterByIncludeWords(
   user: CupidUser,
   includeWords: string[]
-): boolean {
+): [boolean, string] {
   const basics = getDetail(user.detailSentences, "basics") || "";
   const looks = getDetail(user.detailSentences, "looks") || "";
   const background = getDetail(user.detailSentences, "background") || "";
@@ -84,67 +80,68 @@ function filterByIncludeWords(
     ...user.essaysWithUniqueIds.map((essay) => essay.processedContent),
   ].join(" ");
 
-  return hasWords(allText, includeWords);
+  const result = hasWords(allText, includeWords);
+  return [result, result ? "" : "Does not contain required words"];
 }
 
 function filterByReligion(
   user: CupidUser,
   isReligious: boolean,
   passIfNotSpecified: boolean
-): boolean {
+): [boolean, string] {
   const religion = getDetail(user.detailSentences, "background");
 
-  if (passIfNotSpecified && !religion) return true;
-  return (
-    (isReligious && filterByIncludeWords(user, RELIGIOUS_RESERVED_WORDS)) ||
-    (!isReligious && filterByExcludeWords(user, RELIGIOUS_RESERVED_WORDS))
-  );
+  if (passIfNotSpecified && !religion) return [true, ""];
+  const result =
+    (isReligious && filterByIncludeWords(user, RELIGIOUS_RESERVED_WORDS)[0]) ||
+    (!isReligious && filterByExcludeWords(user, RELIGIOUS_RESERVED_WORDS)[0]);
+  return [result, result ? "" : "Religion mismatch"];
 }
 
 function filterBySmoking(
   user: CupidUser,
   isSmoking: boolean,
   passIfNotSpecified: boolean
-): boolean {
+): [boolean, string] {
   const smoking = getDetail(user.detailSentences, "lifestyle");
-  if (passIfNotSpecified && !smoking) return true;
-  return (
+  if (passIfNotSpecified && !smoking) return [true, ""];
+  const result =
     (smoking?.includes("Smokes cigarettes") && isSmoking) ||
-    (smoking?.includes("Doesn't smoke") && !isSmoking)
-  );
+    (smoking?.includes("Doesn't smoke") && !isSmoking);
+  return [result, result ? "" : "Smoking preference mismatch"];
 }
 
 function filterByWeed(
   user: CupidUser,
   isWeed: boolean,
   passIfNotSpecified: boolean
-): boolean {
+): [boolean, string] {
   const weed = getDetail(user.detailSentences, "lifestyle");
-  if (passIfNotSpecified && !weed) return true;
-  return (
+  if (passIfNotSpecified && !weed) return [true, ""];
+  const result =
     (weed?.includes("Smokes marijuana") && isWeed) ||
-    (weed?.includes("Never smokes marijuana") && !isWeed)
-  );
+    (weed?.includes("Never smokes marijuana") && !isWeed);
+  return [result, result ? "" : "Weed preference mismatch"];
 }
 
 function filterByDrinking(
   user: CupidUser,
   isDrinking: boolean,
   passIfNotSpecified: boolean
-): boolean {
+): [boolean, string] {
   const drinking = getDetail(user.detailSentences, "lifestyle");
-  if (passIfNotSpecified && !drinking) return true;
-  return (
+  if (passIfNotSpecified && !drinking) return [true, ""];
+  const result =
     (drinking?.includes("Drinks") && isDrinking) ||
-    (drinking?.includes("Doesn't drink") && !isDrinking)
-  );
+    (drinking?.includes("Doesn't drink") && !isDrinking);
+  return [result, result ? "" : "Drinking preference mismatch"];
 }
 
 function filterByLanguages(
   user: CupidUser,
   languages: string[],
   passIfNotSpecified: boolean
-): boolean {
+): [boolean, string] {
   const backgroundDetails = getDetail(user.detailSentences, "background") || "";
 
   const userLanguages = backgroundDetails
@@ -160,165 +157,240 @@ function filterByLanguages(
     )
     .map((lang) => lang.toLowerCase());
 
-  if (passIfNotSpecified && !userLanguages.length) return true;
+  if (passIfNotSpecified && !userLanguages.length) return [true, ""];
 
   const lowerCaseLanguages = languages.map((lang) => lang.toLowerCase());
-  return lowerCaseLanguages.some((lang) => userLanguages.includes(lang));
+  const result = lowerCaseLanguages.some((lang) =>
+    userLanguages.includes(lang)
+  );
+  return [result, result ? "" : "Language preference mismatch"];
 }
+
 function filterByJewish(
   user: CupidUser,
   isJewish: boolean,
   passIfNotSpecified: boolean
-): boolean {
+): [boolean, string] {
   const religion = getDetail(user.detailSentences, "background");
-  if (passIfNotSpecified && !religion) return true;
-  return (
+  if (passIfNotSpecified && !religion) return [true, ""];
+  const result =
     (religion?.includes("Jewish") && isJewish) ||
-    (!religion?.includes("Jewish") && !isJewish)
-  );
+    (!religion?.includes("Jewish") && !isJewish);
+  return [result, result ? "" : "Jewish preference mismatch"];
 }
 
 function filterByEducationLevel(
   user: CupidUser,
   passIfNotSpecified: boolean
-): boolean {
+): [boolean, string] {
   const education = getDetail(user.detailSentences, "background");
-  if (passIfNotSpecified && !education) return true;
-  return education?.includes("Graduate degree");
+  if (passIfNotSpecified && !education) return [true, ""];
+  const result = education?.includes("Graduate degree");
+  return [result, result ? "" : "Education level mismatch"];
 }
 
 function filterByEmployment(
   user: CupidUser,
   passIfNotSpecified: boolean
-): boolean {
+): [boolean, string] {
   const employment = getDetail(user.detailSentences, "background") || "";
 
-  if (passIfNotSpecified && !employment) return true;
-  return EMPLOYED_STATUSES.some((status) => employment?.toLowerCase().includes(status.toLowerCase()));
+  if (passIfNotSpecified && !employment) return [true, ""];
+  const result = EMPLOYED_STATUSES.some((status) =>
+    employment?.toLowerCase().includes(status.toLowerCase())
+  );
+  return [result, result ? "" : "Employment status mismatch"];
 }
 
 function filterByBodyStyle(
   user: CupidUser,
   passIfNotSpecified: boolean
-): boolean {
+): [boolean, string] {
   const looks = getDetail(user.detailSentences, "looks");
-  if (passIfNotSpecified && !looks) return true;
-  return FAT_BODY_TYPES.every((fatType) => !looks?.toLowerCase().includes(fatType.toLowerCase()));
+  if (passIfNotSpecified && !looks) return [true, ""];
+  const result = FAT_BODY_TYPES.every(
+    (fatType) => !looks?.toLowerCase().includes(fatType.toLowerCase())
+  );
+  return [result, result ? "" : "Body style mismatch"];
 }
 
 function filterByMinMatchPercentage(
   match: Match,
   minMatchPercentage: number
-): boolean {
-  return match.matchPercent >= minMatchPercentage;
+): [boolean, string] {
+  const result = match.matchPercent >= minMatchPercentage;
+  return [result, result ? "" : "Match percentage below threshold"];
 }
 
-function filterByMutualLike(match: Match): boolean {
-  return match.targetLikes;
+function filterByMutualLike(match: Match): [boolean, string] {
+  const result = match.targetLikes;
+  return [result, result ? "" : "Mutual like mismatch"];
 }
 
 function filterByHasKids(
   user: CupidUser,
   hasKids: boolean,
   passIfNotSpecified: boolean
-): boolean {
+): [boolean, string] {
   const family = getDetail(user.detailSentences, "family");
-  if (passIfNotSpecified && !family) return true;
+  if (passIfNotSpecified && !family) return [true, ""];
 
-  return (
+  const result =
     (hasKids && family?.includes("Has kid")) ||
-    (!hasKids && !family?.includes("Has kid"))
-  );
+    (!hasKids && !family?.includes("Has kid"));
+  return [result, result ? "" : "Kids preference mismatch"];
 }
 
 export function getRelevantMatchesByFilters(
   matches: Match[],
   filters: CupidFilters,
   passIfNotSpecified: boolean
-): Match[] {
-  return matches.filter((match) => {
+): { foundMatches: Match[]; reasons: Record<string, string> } {
+  const foundMatches: Match[] = [];
+  const reasons: Record<string, string> = {};
+
+  matches.forEach((match) => {
     const user = match.user;
+    let isMatch = true;
+    const reasonsList: string[] = [];
 
-    if (
-      filters.isStraight !== undefined &&
-      !filterByOrientation(user, filters.isStraight, passIfNotSpecified)
-    )
-      return false;
-    if (
-      filters.isMonogamy !== undefined &&
-      !filterByMonogamy(user, filters.isMonogamy, passIfNotSpecified)
-    )
-      return false;
-    if (
-      filters.heightRange &&
-      !filterByHeight(user, filters.heightRange)
-    )
-      return false;
-    if (
-      filters.filterIfHasWords &&
-      !filterByExcludeWords(user, filters.filterIfHasWords)
-    )
-      return false;
-    if (
-      filters.onlyAcceptIfIncludeWords &&
-      !filterByIncludeWords(user, filters.onlyAcceptIfIncludeWords)
-    )
-      return false;
-    if (
-      filters.isReligious !== undefined &&
-      !filterByReligion(user, filters.isReligious, passIfNotSpecified)
-    )
-      return false;
-    if (
-      filters.isSmoking !== undefined &&
-      !filterBySmoking(user, filters.isSmoking, passIfNotSpecified)
-    )
-      return false;
-    if (
-      filters.isWeed !== undefined &&
-      !filterByWeed(user, filters.isWeed, passIfNotSpecified)
-    )
-      return false;
-    if (
-      filters.isDrinking !== undefined &&
-      !filterByDrinking(user, filters.isDrinking, passIfNotSpecified)
-    )
-      return false;
-    if (
-      filters.languages &&
-      !filterByLanguages(user, filters.languages, passIfNotSpecified)
-    )
-      return false;
-    if (
-      filters.isJewish !== undefined &&
-      !filterByJewish(user, filters.isJewish, passIfNotSpecified)
-    )
-      return false;
-    if (
-      filters.isEducated &&
-      !filterByEducationLevel(user, passIfNotSpecified)
-    )
-      return false;
-    if (filters.isEmployed && !filterByEmployment(user, passIfNotSpecified))
-      return false;
-    if (
-      filters.isNotSemitrailer &&
-      !filterByBodyStyle(user, passIfNotSpecified)
-    )
-      return false;
-    if (
-      filters.minMatchPercentage !== undefined &&
-      !filterByMinMatchPercentage(match, filters.minMatchPercentage)
-    )
-      return false;
-    if (filters.isMutualLike !== undefined && !filterByMutualLike(match))
-      return false;
+    if (filters.isStraight !== undefined) {
+      const [result, reason] = filterByOrientation(
+        user,
+        filters.isStraight,
+        passIfNotSpecified
+      );
+      if (!result) reasonsList.push(reason);
+      isMatch = isMatch && result;
+    }
+    if (filters.isMonogamy !== undefined) {
+      const [result, reason] = filterByMonogamy(
+        user,
+        filters.isMonogamy,
+        passIfNotSpecified
+      );
+      if (!result) reasonsList.push(reason);
+      isMatch = isMatch && result;
+    }
+    if (filters.heightRange) {
+      const [result, reason] = filterByHeight(user, filters.heightRange);
+      if (!result) reasonsList.push(reason);
+      isMatch = isMatch && result;
+    }
+    if (filters.filterIfHasWords) {
+      const [result, reason] = filterByExcludeWords(
+        user,
+        filters.filterIfHasWords
+      );
+      if (!result) reasonsList.push(reason);
+      isMatch = isMatch && result;
+    }
+    if (filters.onlyAcceptIfIncludeWords) {
+      const [result, reason] = filterByIncludeWords(
+        user,
+        filters.onlyAcceptIfIncludeWords
+      );
+      if (!result) reasonsList.push(reason);
+      isMatch = isMatch && result;
+    }
+    if (filters.isReligious !== undefined) {
+      const [result, reason] = filterByReligion(
+        user,
+        filters.isReligious,
+        passIfNotSpecified
+      );
+      if (!result) reasonsList.push(reason);
+      isMatch = isMatch && result;
+    }
+    if (filters.isSmoking !== undefined) {
+      const [result, reason] = filterBySmoking(
+        user,
+        filters.isSmoking,
+        passIfNotSpecified
+      );
+      if (!result) reasonsList.push(reason);
+      isMatch = isMatch && result;
+    }
+    if (filters.isWeed !== undefined) {
+      const [result, reason] = filterByWeed(
+        user,
+        filters.isWeed,
+        passIfNotSpecified
+      );
+      if (!result) reasonsList.push(reason);
+      isMatch = isMatch && result;
+    }
+    if (filters.isDrinking !== undefined) {
+      const [result, reason] = filterByDrinking(
+        user,
+        filters.isDrinking,
+        passIfNotSpecified
+      );
+      if (!result) reasonsList.push(reason);
+      isMatch = isMatch && result;
+    }
+    if (filters.languages) {
+      const [result, reason] = filterByLanguages(
+        user,
+        filters.languages,
+        passIfNotSpecified
+      );
+      if (!result) reasonsList.push(reason);
+      isMatch = isMatch && result;
+    }
+    if (filters.isJewish !== undefined) {
+      const [result, reason] = filterByJewish(
+        user,
+        filters.isJewish,
+        passIfNotSpecified
+      );
+      if (!result) reasonsList.push(reason);
+      isMatch = isMatch && result;
+    }
+    if (filters.isEducated) {
+      const [result, reason] = filterByEducationLevel(user, passIfNotSpecified);
+      if (!result) reasonsList.push(reason);
+      isMatch = isMatch && result;
+    }
+    if (filters.isEmployed) {
+      const [result, reason] = filterByEmployment(user, passIfNotSpecified);
+      if (!result) reasonsList.push(reason);
+      isMatch = isMatch && result;
+    }
+    if (filters.isNotSemitrailer) {
+      const [result, reason] = filterByBodyStyle(user, passIfNotSpecified);
+      if (!result) reasonsList.push(reason);
+      isMatch = isMatch && result;
+    }
+    if (filters.minMatchPercentage !== undefined) {
+      const [result, reason] = filterByMinMatchPercentage(
+        match,
+        filters.minMatchPercentage
+      );
+      if (!result) reasonsList.push(reason);
+      isMatch = isMatch && result;
+    }
+    if (filters.isMutualLike !== undefined) {
+      const [result, reason] = filterByMutualLike(match);
+      if (!result) reasonsList.push(reason);
+      isMatch = isMatch && result;
+    }
+    if (filters.hasKids !== undefined) {
+      const [result, reason] = filterByHasKids(
+        match.user,
+        filters.hasKids,
+        passIfNotSpecified
+      );
+      if (!result) reasonsList.push(reason);
+      isMatch = isMatch && result;
+    }
 
-    if (
-      filters.hasKids !== undefined &&
-      !filterByHasKids(match.user, filters.hasKids, passIfNotSpecified)
-    )
-      return false;
-    return true;
+    if (isMatch) {
+      foundMatches.push(match);
+    } else {
+      reasons[user.id] = reasonsList.join(", ");
+    }
   });
+
+  return { foundMatches, reasons };
 }

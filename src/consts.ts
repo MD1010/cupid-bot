@@ -24,7 +24,7 @@ export const STORAGE_KEYS = {
 
 export const DEFAULT_MESSAGE = "היי :)";
 export const MAX_LIKES_PER_DAY = 3;
-export const MAX_RETRIES = 1;
+export const MAX_RETRIES = 5;
 export const SLEEP_TIME_BETWEEN_SENDS = 500;
 
 export const RELIGIOUS_RESERVED_WORDS = [

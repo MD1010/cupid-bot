@@ -36,10 +36,12 @@ export const getUserPotentialMatches = async (
           potentialMatch.stream
         );
       }
-      if (foundMatches.length >= maxPotentialMatchesToFetch) {
-        console.log("Reached LikesCap - come back tomorrow");
-        break;
-      }
+      // console.log(foundMatches.length, maxPotentialMatchesToFetch);
+
+      // if (foundMatches.length >= maxPotentialMatchesToFetch) {
+      //   console.log("Reached LikesCap - come back tomorrow");
+      //   break;
+      // }
     }
   }
 
@@ -54,7 +56,7 @@ const filterMatches = async (
   filters: CupidFilters,
   ignoreIfNotSpcified: boolean
 ) => {
-  const passed = getRelevantMatchesByFilters(
+  const { foundMatches: passed, reasons } = getRelevantMatchesByFilters(
     matches,
     filters,
     ignoreIfNotSpcified
@@ -64,7 +66,7 @@ const filterMatches = async (
     passedMap.set(passedMatch.user.id, passedMatch);
   }
 
-  return passedMap;
+  return { passedMap, reasons };
 };
 
 export const sendMessagesToRelevant = async ({
@@ -89,11 +91,15 @@ export const sendMessagesToRelevant = async ({
     maxPotentialMatchesToFetch
   );
 
-  const passedMatches = await filterMatches(
+  console.log("found matches", foundMatches);
+
+  const { passedMap: passedMatches, reasons } = await filterMatches(
     foundMatches,
     filters,
     passIfNotSpecified
   );
+
+  console.log("passed ", passedMatches);
 
   if (!passedMatches.size) return;
 
@@ -103,13 +109,13 @@ export const sendMessagesToRelevant = async ({
   for (const { user } of foundMatches) {
     if (seenIds.has(user.id)) continue;
     if (passedMatches.get(user.id)) {
-      console.log(`✅ ${user.id}`);
-      await sendMessage(user.id, messageToSend);
+      console.log(`✅ ${user.primaryImage.square400}`, user);
+      // await sendMessage(user.id, messageToSend);
       numOfSent += 1;
       await storage.setItem(STORAGE_KEYS.sentAmount, numOfSent);
     } else {
-      console.log("❌", user.id);
-      await sendUserPass(user.id, userToStreamMap.get(user.id));
+      console.log("❌", user.primaryImage.square400, reasons[user.id], user);
+      // await sendUserPass(user.id, userToStreamMap.get(user.id));
     }
     seenIds.add(user.id);
     console.log("💤");
