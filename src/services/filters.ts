@@ -86,12 +86,8 @@ function filterByIncludeWords(
 
 function filterByReligion(
   user: CupidUser,
-  isReligious: boolean,
-  passIfNotSpecified: boolean
+  isReligious: boolean
 ): [boolean, string] {
-  const religion = getDetail(user.detailSentences, "background");
-
-  if (passIfNotSpecified && !religion) return [true, ""];
   const result =
     (isReligious && filterByIncludeWords(user, RELIGIOUS_RESERVED_WORDS)[0]) ||
     (!isReligious && filterByExcludeWords(user, RELIGIOUS_RESERVED_WORDS)[0]);
@@ -100,27 +96,26 @@ function filterByReligion(
 
 function filterBySmoking(
   user: CupidUser,
-  isSmoking: boolean,
-  passIfNotSpecified: boolean
+  isSmoking: boolean
 ): [boolean, string] {
-  const smoking = getDetail(user.detailSentences, "lifestyle");
-  if (passIfNotSpecified && !smoking) return [true, ""];
+  const lifestyleDetail = getDetail(user.detailSentences, "lifestyle");
+
+  if (!lifestyleDetail) return [true, ""];
   const result =
-    (smoking?.includes("Smokes cigarettes") && isSmoking) ||
-    (smoking?.includes("Doesn't smoke") && !isSmoking);
+    (lifestyleDetail?.includes("Smokes cigarettes") && isSmoking) ||
+    lifestyleDetail?.includes("Doesn't smoke") ||
+    (!lifestyleDetail?.includes("Smokes cigarettes") && !isSmoking);
+
   return [result, result ? "" : "Smoking preference mismatch"];
 }
 
-function filterByWeed(
-  user: CupidUser,
-  isWeed: boolean,
-  passIfNotSpecified: boolean
-): [boolean, string] {
-  const weed = getDetail(user.detailSentences, "lifestyle");
-  if (passIfNotSpecified && !weed) return [true, ""];
+function filterByWeed(user: CupidUser, isWeed: boolean): [boolean, string] {
+  const lifestyleDetail = getDetail(user.detailSentences, "lifestyle");
+  if (!lifestyleDetail) return [true, ""];
   const result =
-    (weed?.includes("Smokes marijuana") && isWeed) ||
-    (weed?.includes("Never smokes marijuana") && !isWeed);
+    (lifestyleDetail?.includes("Smokes marijuana") && isWeed) ||
+    lifestyleDetail?.includes("Never smokes marijuana") ||
+    (!lifestyleDetail?.includes("Smokes marijuana") && !isWeed);
   return [result, result ? "" : "Weed preference mismatch"];
 }
 
@@ -294,29 +289,17 @@ export function getRelevantMatchesByFilters(
       isMatch = isMatch && result;
     }
     if (filters.isReligious !== undefined) {
-      const [result, reason] = filterByReligion(
-        user,
-        filters.isReligious,
-        passIfNotSpecified
-      );
+      const [result, reason] = filterByReligion(user, filters.isReligious);
       if (!result) reasonsList.push(reason);
       isMatch = isMatch && result;
     }
     if (filters.isSmoking !== undefined) {
-      const [result, reason] = filterBySmoking(
-        user,
-        filters.isSmoking,
-        passIfNotSpecified
-      );
+      const [result, reason] = filterBySmoking(user, filters.isSmoking);
       if (!result) reasonsList.push(reason);
       isMatch = isMatch && result;
     }
     if (filters.isWeed !== undefined) {
-      const [result, reason] = filterByWeed(
-        user,
-        filters.isWeed,
-        passIfNotSpecified
-      );
+      const [result, reason] = filterByWeed(user, filters.isWeed);
       if (!result) reasonsList.push(reason);
       isMatch = isMatch && result;
     }

@@ -1,9 +1,9 @@
 import type { PlasmoCSConfig } from "plasmo";
-import { STORAGE_KEYS } from '~consts';
+import { STORAGE_KEYS } from "~consts";
 
 import { updateRemainingLikes } from "~services/likes";
 import { setCurrentUserId } from "~services/user";
-import { storage } from '~storage';
+import { storage } from "~storage";
 import { checkInitialLoaded } from "~utils/pageLoad";
 
 export const config: PlasmoCSConfig = {
@@ -13,8 +13,6 @@ export const config: PlasmoCSConfig = {
 
 (async () => {
   await storage.setItem(STORAGE_KEYS.sentAmount, 0);
-  if (checkInitialLoaded()) {
-    await setCurrentUserId();
-    await updateRemainingLikes();
-  }
+  await setCurrentUserId();
+  await updateRemainingLikes();
 })();

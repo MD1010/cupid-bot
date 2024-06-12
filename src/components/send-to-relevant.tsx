@@ -20,7 +20,7 @@ export const SendToRelevant = () => {
 
   const sendToSpecificId = async () => {
     setIsSendingInProgress(true);
-    await sendMessageToTargetId("3770604814292073573", "");
+    await sendMessageToTargetId("11919815807565382486", message2);
     setIsSendingInProgress(false);
   };
 
@@ -33,14 +33,20 @@ export const SendToRelevant = () => {
           for (let i = 0; i < MAX_RETRIES; i++) {
             setIsSendingInProgress(true);
             await sendMessagesToRelevant({
-              passIfNotSpecified: true,
+              passIfNotSpecified: false,
               messageToSend: message,
               filters: {
                 isNotSemitrailer: true,
-                heightRange: { from: 155, to: 172 },
+                heightRange: { from: 153, to: 172 },
                 isWeed: false,
                 isSmoking: false,
                 isReligious: false,
+                filterIfHasWords: [
+                  "Vegan",
+                  "יין",
+                  "Drinks often",
+                  "Bisexual",
+                ],
               },
             });
 
@@ -58,13 +64,13 @@ export const SendToRelevant = () => {
         )}
       </button>
 
-      {/* <button
+      <button
         className="plasmo-bg-red-600 plasmo-w-[200px] plasmo-mx-10"
         disabled={isSendingInProgress}
         onClick={sendToSpecificId}
       >
         Send to specific one
-      </button> */}
+      </button>
 
       <div className="plasmo-text-blue-600">Total sent: {totalMatchesSent}</div>
     </>
