@@ -85,7 +85,6 @@ interface LikesCap {
 }
 
 export type NumericRange = { from: number; to: number };
-type LocationRange = {from: string, maxKM: number}
 export type LocationCoordinates = {lat: number, lon: number};
 
 export interface CupidFilters {
@@ -106,5 +105,5 @@ export interface CupidFilters {
   minMatchPercentage?: number;
   isMutualLike?: boolean;
   hasKids?: boolean;
-  maxDistance?: LocationRange;
+  maxDistance?: number;
 }

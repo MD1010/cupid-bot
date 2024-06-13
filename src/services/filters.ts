@@ -14,9 +14,10 @@ import { getDetail, getHeight, hasWords } from "~utils/filters";
 import {
   calculateDistanceKm,
   getCitiesCoordinates,
+  getMyLocationCoords,
   normalizeLocation,
 } from "~utils/location";
-import { normalizeString } from '~utils/string';
+import { normalizeString } from "~utils/string";
 
 function filterByOrientation(
   user: CupidUser,
@@ -261,7 +262,7 @@ async function filterByPlace(
   try {
     const distanceKm = calculateDistanceKm(fromLocationCoords, matchCoords);
     const result = distanceKm <= maxDistanceKm;
-    
+
     return [result, result ? "" : `Distance mismatch: ${distanceKm} km away`];
   } catch (error) {
     console.error(error);
@@ -276,8 +277,9 @@ export async function getRelevantMatchesByFilters(
 ): Promise<{ foundMatches: Match[]; reasons: Record<string, string> }> {
   const foundMatches: Match[] = [];
   const reasons: Record<string, string> = {};
+
   const coordinatesMap = await getCitiesCoordinates();
-  console.log("map", coordinatesMap);
+  const userCoords = await getMyLocationCoords();
 
   matches.forEach(async (match) => {
     const user = match.user;
@@ -409,12 +411,11 @@ export async function getRelevantMatchesByFilters(
       reasons[user.id] = reasonsList.join(", ");
     }
     if (filters.maxDistance) {
-      const userCoords = coordinatesMap[filters.maxDistance.from];
       const matchCoords =
         coordinatesMap[
           normalizeLocation(normalizeString(match.user.location.summary))
         ];
-        
+
       if (!matchCoords) {
         return foundMatches.push(match);
       }
@@ -423,11 +424,10 @@ export async function getRelevantMatchesByFilters(
         user,
         userCoords,
         matchCoords,
-        filters.maxDistance.maxKM,
+        filters.maxDistance,
         passIfNotSpecified
       );
-      
-      
+
       if (!result) reasonsList.push(reason);
       isMatch = isMatch && result;
     }

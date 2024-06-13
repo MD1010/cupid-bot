@@ -79,4 +79,22 @@ const normalizeLocation = (location: string) => {
   return normalizedLocations[location] || location;
 };
 
-export { calculateDistanceKm, getCitiesCoordinates, normalizeLocation };
+const getMyLocationCoords = async () => {
+  try {
+    const res = await fetch(
+      "https://api.bigdatacloud.net/data/reverse-geocode-client"
+    );
+
+    const data = (await res.json()) as any;
+    return { lat: data.latitude, lon: data.longitude };
+  } catch (e) {
+    console.error(e);
+  }
+};
+
+export {
+  calculateDistanceKm,
+  getCitiesCoordinates,
+  normalizeLocation,
+  getMyLocationCoords,
+};

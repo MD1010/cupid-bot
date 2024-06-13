@@ -87,7 +87,7 @@ export const sendMessagesToRelevant = async ({
   let numOfSent = 0;
 
   const { foundMatches, userToStreamMap } = await getUserPotentialMatches(
-    30
+    maxPotentialMatchesToFetch
   );
 
   console.log("found matches", foundMatches);

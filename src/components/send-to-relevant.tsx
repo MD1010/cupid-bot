@@ -41,7 +41,7 @@ export const SendToRelevant = () => {
                 isWeed: false,
                 isSmoking: false,
                 isReligious: false,
-                maxDistance: { from: "Ashdod", maxKM: 20 },
+                maxDistance: 40, // change to 
                 filterIfHasWords: ["Vegan", "יין", "Drinks often", "Bisexual"],
               },
             });
