@@ -3,8 +3,20 @@ import {
   FAT_BODY_TYPES,
   RELIGIOUS_RESERVED_WORDS,
 } from "~consts";
-import type { CupidFilters, CupidUser, Match, NumericRange } from "~types";
+import type {
+  CupidFilters,
+  CupidUser,
+  LocationCoordinates,
+  Match,
+  NumericRange,
+} from "~types";
 import { getDetail, getHeight, hasWords } from "~utils/filters";
+import {
+  calculateDistanceKm,
+  getCitiesCoordinates,
+  normalizeLocation,
+} from "~utils/location";
+import { normalizeString } from '~utils/string';
 
 function filterByOrientation(
   user: CupidUser,
@@ -236,15 +248,38 @@ function filterByHasKids(
   return [result, result ? "" : "Kids preference mismatch"];
 }
 
-export function getRelevantMatchesByFilters(
+async function filterByPlace(
+  user: CupidUser,
+  fromLocationCoords: LocationCoordinates,
+  matchCoords: LocationCoordinates,
+  maxDistanceKm: number,
+  passIfNotSpecified: boolean
+): Promise<[boolean, string]> {
+  const matchLocation = user.location.summary;
+  if (passIfNotSpecified && !matchLocation) return [true, ""];
+
+  try {
+    const distanceKm = calculateDistanceKm(fromLocationCoords, matchCoords);
+    const result = distanceKm <= maxDistanceKm;
+    
+    return [result, result ? "" : `Distance mismatch: ${distanceKm} km away`];
+  } catch (error) {
+    console.error(error);
+    return [false, "Error in calculating distance"];
+  }
+}
+
+export async function getRelevantMatchesByFilters(
   matches: Match[],
   filters: CupidFilters,
   passIfNotSpecified: boolean
-): { foundMatches: Match[]; reasons: Record<string, string> } {
+): Promise<{ foundMatches: Match[]; reasons: Record<string, string> }> {
   const foundMatches: Match[] = [];
   const reasons: Record<string, string> = {};
+  const coordinatesMap = await getCitiesCoordinates();
+  console.log("map", coordinatesMap);
 
-  matches.forEach((match) => {
+  matches.forEach(async (match) => {
     const user = match.user;
     let isMatch = true;
     const reasonsList: string[] = [];
@@ -364,6 +399,35 @@ export function getRelevantMatchesByFilters(
         filters.hasKids,
         passIfNotSpecified
       );
+      if (!result) reasonsList.push(reason);
+      isMatch = isMatch && result;
+    }
+
+    if (isMatch) {
+      foundMatches.push(match);
+    } else {
+      reasons[user.id] = reasonsList.join(", ");
+    }
+    if (filters.maxDistance) {
+      const userCoords = coordinatesMap[filters.maxDistance.from];
+      const matchCoords =
+        coordinatesMap[
+          normalizeLocation(normalizeString(match.user.location.summary))
+        ];
+        
+      if (!matchCoords) {
+        return foundMatches.push(match);
+      }
+
+      const [result, reason] = await filterByPlace(
+        user,
+        userCoords,
+        matchCoords,
+        filters.maxDistance.maxKM,
+        passIfNotSpecified
+      );
+      
+      
       if (!result) reasonsList.push(reason);
       isMatch = isMatch && result;
     }

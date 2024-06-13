@@ -16,4 +16,5 @@ const getCurrentUserId = async () => {
   }
 };
 
-export { getCurrentUserId };
+
+export { getCurrentUserId};
