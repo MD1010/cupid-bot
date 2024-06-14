@@ -1,4 +1,4 @@
-import { fetchCupidAPI } from "~utils/cupidRequest";
+import { fetchCupidAPI } from "@/utils/cupidRequest";
 import { QUERIES } from "../consts";
 
 const getCurrentUserId = async () => {
@@ -16,5 +16,4 @@ const getCurrentUserId = async () => {
   }
 };
 
-
-export { getCurrentUserId};
+export { getCurrentUserId };

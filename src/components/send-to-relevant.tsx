@@ -1,8 +1,12 @@
+import { STORAGE_KEYS, MAX_RETRIES } from "@/consts";
+import { sendMessagesToRelevant } from "@/services/matches";
+import { sendMessageToTargetId } from "@/services/messages";
 import { useStorage } from "@plasmohq/storage/hook";
 import { useEffect, useState } from "react";
-import { MAX_RETRIES, STORAGE_KEYS } from "~consts";
-import { sendMessagesToRelevant } from "~services/matches";
-import { sendMessageToTargetId } from "~services/messages";
+import { Button } from "./ui/button";
+import { Switch } from "./ui/switch";
+
+// import { Button } from "@/components/ui/button"
 
 export const SendToRelevant = () => {
   const [isSendingInProgress, setIsSendingInProgress] = useState(false);
@@ -26,8 +30,10 @@ export const SendToRelevant = () => {
 
   return (
     <>
-      <button
-        className="plasmo-bg-red-600 plasmo-w-[200px] "
+      <Button>Send to relevant</Button>
+     
+      {/* <button
+        className="bg-primary text-white cursor-pointer rounded-[2px] px-[10px] min-w-[120px] uppercase h-[40px] font-bold text-[.875rem] hover:bg-light-primary"
         disabled={isSendingInProgress}
         onClick={async () => {
           for (let i = 0; i < MAX_RETRIES; i++) {
@@ -65,17 +71,17 @@ export const SendToRelevant = () => {
             {foundMatches && <div>Found {foundMatches} new matches</div>}
           </div>
         )}
-      </button>
+      </button> */}
 
       <button
-        className="plasmo-bg-red-600 plasmo-w-[200px] plasmo-mx-10"
+        className="bg-red-600 w-[200px] mx-10"
         disabled={isSendingInProgress}
         onClick={sendToSpecificId}
       >
         Send to specific one
       </button>
 
-      <div className="plasmo-text-blue-600">Total sent: {totalMatchesSent}</div>
+      <div className="text-blue-600">Total sent: {totalMatchesSent}</div>
     </>
   );
 };

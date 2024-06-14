@@ -1,4 +1,4 @@
-import type { LocationCoordinates } from "~types";
+import type { LocationCoordinates } from "@/types";
 import { sleep } from "./time";
 
 async function getCitiesCoordinates() {

@@ -1,11 +1,7 @@
-import {
-  CUPID_BASE_GQL_URL,
-  DEFAULT_MESSAGE,
-  QUERIES,
-  STORAGE_KEYS,
-} from "~consts";
-import { storage } from "~storage";
-import { fetchCupidAPI } from "~utils/cupidRequest";
+import { CUPID_BASE_GQL_URL, DEFAULT_MESSAGE, QUERIES, STORAGE_KEYS } from '@/consts';
+import { storage } from '@/storage';
+import { fetchCupidAPI } from '@/utils/cupidRequest';
+
 
 export const sendMessage = async (
   userId: string,

@@ -1,5 +1,6 @@
+import { CUPID_BASE_GQL_URL } from '@/consts';
 import _ from "lodash";
-import { CUPID_BASE_GQL_URL } from '~consts';
+
 
 
 type CupidGQLBody = {

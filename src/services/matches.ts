@@ -1,12 +1,12 @@
 import _ from "lodash";
 import { getRemainingLikes, sendUserPass } from "~api/likes";
+import { sendMessage } from '~api/message';
 import { SLEEP_TIME_BETWEEN_SENDS, STORAGE_KEYS } from "~consts";
 import { storage } from "~storage";
 import type { CupidFilters, Match } from "~types";
 import { sleep } from "~utils/time";
 import { getRelevantMatchesByFilters } from "./filters";
 import { getUserInfo } from "./user";
-import { sendMessage } from '~api/message';
 
 const STACKS_TO_IGNORE = ["PENPAL"];
 

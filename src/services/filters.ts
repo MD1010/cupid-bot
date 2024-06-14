@@ -1,23 +1,9 @@
-import {
-  EMPLOYED_STATUSES,
-  FAT_BODY_TYPES,
-  RELIGIOUS_RESERVED_WORDS,
-} from "~consts";
-import type {
-  CupidFilters,
-  CupidUser,
-  LocationCoordinates,
-  Match,
-  NumericRange,
-} from "~types";
-import { getDetail, getHeight, hasWords } from "~utils/filters";
-import {
-  calculateDistanceKm,
-  getCitiesCoordinates,
-  getMyLocationCoords,
-  normalizeLocation,
-} from "~utils/location";
-import { normalizeString } from "~utils/string";
+import { EMPLOYED_STATUSES, FAT_BODY_TYPES, RELIGIOUS_RESERVED_WORDS } from '@/consts';
+import type { CupidFilters, CupidUser, LocationCoordinates, Match, NumericRange } from '@/types';
+import { getDetail, getHeight, hasWords } from '@/utils/filters';
+import { calculateDistanceKm, getCitiesCoordinates, getMyLocationCoords, normalizeLocation } from '@/utils/location';
+import { normalizeString } from '@/utils/string';
+
 
 function filterByOrientation(
   user: CupidUser,

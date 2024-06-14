@@ -1,4 +1,4 @@
-import type { DetailSentence } from "~types";
+import type { DetailSentence } from "@/types";
 
 function getDetail(details: DetailSentence[], key: string): string | null {
   const detail = details.find((detail) => detail.name === key);

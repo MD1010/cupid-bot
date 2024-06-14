@@ -1,9 +1,8 @@
+import { STORAGE_KEYS } from "@/consts";
+import { updateRemainingLikes } from "@/services/likes";
+import { setCurrentUserId } from "@/services/user";
+import { storage } from "@/storage";
 import type { PlasmoCSConfig } from "plasmo";
-import { STORAGE_KEYS } from "~consts";
-import { updateRemainingLikes } from "~services/likes";
-import { setCurrentUserId } from "~services/user";
-import { storage } from "~storage";
-import { getMyLocationCoords } from '~utils/location';
 
 export const config: PlasmoCSConfig = {
   matches: ["https://www.okcupid.com/*"],

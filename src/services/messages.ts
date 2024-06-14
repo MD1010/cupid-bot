@@ -1,4 +1,4 @@
-import { sendMessage } from "~api/message";
+import { sendMessage } from "@/api/message";
 
 export const sendMessageToTargetId = async (
   targetId: string,

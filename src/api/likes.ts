@@ -1,6 +1,6 @@
-import { CUPID_BASE_GQL_URL, QUERIES } from "~consts";
-import { getUserInfo } from "~services/user";
-import { fetchCupidAPI } from "~utils/cupidRequest";
+import { CUPID_BASE_GQL_URL, QUERIES } from "@/consts";
+import { getUserInfo } from "@/services/user";
+import { fetchCupidAPI } from "@/utils/cupidRequest";
 
 const getRemainingLikes = async () => {
   const data = await getUserInfo();
