@@ -20,7 +20,7 @@ export const SendToRelevant = () => {
 
   const sendToSpecificId = async () => {
     setIsSendingInProgress(true);
-    await sendMessageToTargetId("11919815807565382486", message2);
+    await sendMessageToTargetId("11090308773670736355", message2);
     setIsSendingInProgress(false);
   };
 
@@ -41,8 +41,15 @@ export const SendToRelevant = () => {
                 isWeed: false,
                 isSmoking: false,
                 isReligious: false,
-                maxDistance: 40, // change to 
-                filterIfHasWords: ["Vegan", "יין", "Drinks often", "Bisexual"],
+                maxDistance: 37,
+                filterIfHasWords: [
+                  "Vegan",
+                  "יין",
+                  "Drinks often",
+                  "Bisexual",
+                  "Gluten",
+                ],
+                // todo check why white does not work
               },
             });
 

@@ -1,11 +1,12 @@
 import _ from "lodash";
-import { getRemainingLikes } from "~api/likes";
+import { getRemainingLikes, sendUserPass } from "~api/likes";
 import { SLEEP_TIME_BETWEEN_SENDS, STORAGE_KEYS } from "~consts";
 import { storage } from "~storage";
 import type { CupidFilters, Match } from "~types";
 import { sleep } from "~utils/time";
 import { getRelevantMatchesByFilters } from "./filters";
 import { getUserInfo } from "./user";
+import { sendMessage } from '~api/message';
 
 const STACKS_TO_IGNORE = ["PENPAL"];
 
@@ -35,12 +36,6 @@ export const getUserPotentialMatches = async (
           potentialMatch.stream
         );
       }
-      // console.log(foundMatches.length, maxPotentialMatchesToFetch);
-
-      // if (foundMatches.length >= maxPotentialMatchesToFetch) {
-      //   console.log("Reached LikesCap - come back tomorrow");
-      //   break;
-      // }
     }
   }
 
@@ -109,12 +104,12 @@ export const sendMessagesToRelevant = async ({
     if (seenIds.has(user.id)) continue;
     if (passedMatches.get(user.id)) {
       console.log(`✅ ${user.primaryImage.square400}`, user);
-      // await sendMessage(user.id, messageToSend);
+      await sendMessage(user.id, messageToSend);
       numOfSent += 1;
       await storage.setItem(STORAGE_KEYS.sentAmount, numOfSent);
     } else {
       console.log("❌", user.primaryImage.square400, reasons[user.id], user);
-      // await sendUserPass(user.id, userToStreamMap.get(user.id));
+      await sendUserPass(user.id, userToStreamMap.get(user.id));
     }
     seenIds.add(user.id);
     console.log("💤");

@@ -419,6 +419,7 @@ export async function getRelevantMatchesByFilters(
       if (!matchCoords) {
         return foundMatches.push(match);
       }
+      //todo bug that if already filtered one the other one is not filtered
 
       const [result, reason] = await filterByPlace(
         user,
