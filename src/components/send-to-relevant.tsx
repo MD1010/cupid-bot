@@ -3,24 +3,27 @@ import { sendMessagesToRelevant } from "@/services/matches";
 import { useStorage } from "@plasmohq/storage/hook";
 import { useState } from "react";
 import { Button } from "./ui/button";
+import { sendMessageToTargetId } from '@/services/messages';
 
 export const SendToRelevant = () => {
   const [isSendingInProgress, setIsSendingInProgress] = useState(false);
   const [foundMatches] = useStorage(STORAGE_KEYS.foundMatches);
   const [filters] = useStorage(STORAGE_KEYS.filters);
+  const [remainingLikes] = useStorage(STORAGE_KEYS.likes);
 
-  // const message2 =
-  //   "עכשיו עוד משהו אני די בטוח שזה הדרך הכי יצירתית שאי פעם קיבלת הודעה ממישהו באפליקציה - יש לי הסבר מעניין. תעצרי שנייה ותבדקי מי שלח לך שתי הודעות ראשונות ברצף - מניח שאין כזה :)";
+  const message2 =
+    "";
 
-  // const sendToSpecificId = async () => {
-  //   setIsSendingInProgress(true);
-  //   await sendMessageToTargetId("11090308773670736355", message2);
-  //   setIsSendingInProgress(false);
-  // };
+  const sendToSpecificId = async () => {
+    setIsSendingInProgress(true);
+    await sendMessageToTargetId("5664254551947394216", message2);
+    setIsSendingInProgress(false);
+  };
 
   return (
     <>
       <Button
+        disabled={!remainingLikes}
         variant="default"
         isLoading={isSendingInProgress}
         onClick={async () => {
@@ -38,7 +41,7 @@ export const SendToRelevant = () => {
             `Working on that :)`
           )
         ) : (
-          "Match"
+          remainingLikes ? "Match" : "No likes remaining"
         )}
       </Button>
 
