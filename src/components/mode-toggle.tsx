@@ -8,8 +8,8 @@ export function ModeToggle() {
   const { setTheme, theme } = useTheme();
 
   return (
-    <button className='absolute top-5 right-5' onClick={() => theme === "dark" ? setTheme("light") : setTheme("dark")}>
-      {theme === "dark" ? <Sun02Icon/>: <Moon02Icon className='text-primary'/>}
+    <button className='absolute top-5 right-5 text-primary' onClick={() => theme === "dark" ? setTheme("light") : setTheme("dark")}>
+      {theme === "dark" ? <Sun02Icon/>: <Moon02Icon/>}
     </button>
   );
 }
