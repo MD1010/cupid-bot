@@ -1,4 +1,4 @@
-import { useEffect, useReducer } from "react";
+import { useEffect, useReducer, useRef } from "react";
 import { Button } from "./ui/button";
 import { Label } from "./ui/label";
 import { Slider } from "./ui/slider";
@@ -61,6 +61,7 @@ const reducer = (state: typeof initialState, action: ActionType) => {
 
 export const FiltersForm = () => {
   const [state, dispatch] = useReducer(reducer, initialState);
+  const maxDistanceSliderRef = useRef();
 
   useEffect(() => {
     const loadFiltersFromStorage = async () => {
@@ -149,6 +150,7 @@ export const FiltersForm = () => {
 
     try {
       await storage.setItem(STORAGE_KEYS.filters, filtersObject);
+      window.close();
       console.log("Filters saved to storage:", filtersObject);
     } catch (error) {
       console.error("Error saving filters to storage:", error);
@@ -241,6 +243,7 @@ export const FiltersForm = () => {
           <span className="font-semibold text-sm">{state.maxDistance} km</span>
         </div>
         <Slider
+          ref={maxDistanceSliderRef}
           defaultValue={[state.maxDistance]}
           step={5}
           max={100}
