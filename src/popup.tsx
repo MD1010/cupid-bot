@@ -8,7 +8,7 @@ import { ModeToggle } from './components/mode-toggle';
 function IndexPopup() {
   return (
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-      <div className="flex w-[600px] h-[600px] bg-background">
+      <div className="flex w-[600px] bg-background overflow-x-hidden">
         <ModeToggle/>
         <FiltersForm />
       </div>

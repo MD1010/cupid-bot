@@ -68,12 +68,12 @@ export const sendMessagesToRelevant = async ({
   messageToSend,
   maxSendTo,
   filters,
-  passIfNotSpecified,
+  passIfNotSpecified = false,
 }: {
   messageToSend: string;
   maxSendTo?: number;
   filters?: CupidFilters;
-  passIfNotSpecified: boolean;
+  passIfNotSpecified?: boolean;
 }) => {
   await storage.setItem(STORAGE_KEYS.foundMatches, 0);
   await storage.setItem(STORAGE_KEYS.sentAmount, 0);
