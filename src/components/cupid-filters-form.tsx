@@ -1,4 +1,5 @@
-import { useEffect, useReducer, useRef } from "react";
+import _ from "lodash";
+import { useEffect, useReducer, useRef, useState } from "react";
 import { Button } from "./ui/button";
 import { Label } from "./ui/label";
 import { Slider } from "./ui/slider";
@@ -61,7 +62,6 @@ const reducer = (state: typeof initialState, action: ActionType) => {
 
 export const FiltersForm = () => {
   const [state, dispatch] = useReducer(reducer, initialState);
-  const maxDistanceSliderRef = useRef();
 
   useEffect(() => {
     const loadFiltersFromStorage = async () => {
@@ -157,6 +157,8 @@ export const FiltersForm = () => {
     }
   };
 
+  console.log(state.maxDistance);
+
   return (
     <div className="flex flex-col gap-5 text-lg text-primary p-6 font-bold w-full h-full">
       <h1 className="text-lg text-center">Narrow your search</h1>
@@ -243,8 +245,8 @@ export const FiltersForm = () => {
           <span className="font-semibold text-sm">{state.maxDistance} km</span>
         </div>
         <Slider
-          ref={maxDistanceSliderRef}
-          defaultValue={[state.maxDistance]}
+          value={[state.maxDistance]}
+          defaultValue={[0]}
           step={5}
           max={100}
           onValueChange={(val) =>
@@ -262,7 +264,7 @@ export const FiltersForm = () => {
         </div>
 
         <Slider
-          defaultValue={state.heightRange}
+          value={state.heightRange}
           min={140}
           step={1}
           max={185}
