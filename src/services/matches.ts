@@ -1,12 +1,13 @@
+import { getRemainingLikes, sendUserPass } from '@/api/likes';
+import { sendMessage } from '@/api/message';
+import { STORAGE_KEYS, SLEEP_TIME_BETWEEN_SENDS } from '@/consts';
+import { storage } from '@/storage';
+import type { Match, CupidFilters } from '@/types';
+import { sleep } from '@/utils/time';
 import _ from "lodash";
-import { getRemainingLikes, sendUserPass } from "~api/likes";
-import { sendMessage } from '~api/message';
-import { SLEEP_TIME_BETWEEN_SENDS, STORAGE_KEYS } from "~consts";
-import { storage } from "~storage";
-import type { CupidFilters, Match } from "~types";
-import { sleep } from "~utils/time";
-import { getRelevantMatchesByFilters } from "./filters";
-import { getUserInfo } from "./user";
+import { getRelevantMatchesByFilters } from './filters';
+import { getUserInfo } from './user';
+
 
 const STACKS_TO_IGNORE = ["PENPAL"];
 
@@ -74,6 +75,9 @@ export const sendMessagesToRelevant = async ({
   filters?: CupidFilters;
   passIfNotSpecified: boolean;
 }) => {
+  await storage.setItem(STORAGE_KEYS.foundMatches, 0);
+  await storage.setItem(STORAGE_KEYS.sentAmount, 0);
+
   let maxPotentialMatchesToFetch = maxSendTo
     ? maxSendTo
     : await getRemainingLikes();
