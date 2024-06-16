@@ -74,6 +74,7 @@ const normalizeLocation = (location: string) => {
     "Rishon LeZiyyon": "Rishon LeZion",
     Yehud: "Yehud Monosson",
     "Or`Aquiva": "Or Akiva",
+    Herzliyya: "Herzliya",
   };
 
   return normalizedLocations[location] || location;

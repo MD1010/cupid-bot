@@ -1,13 +1,12 @@
-import _ from "lodash";
-import { useEffect, useReducer, useRef, useState } from "react";
+import { STORAGE_KEYS } from "@/consts";
+import { storage } from "@/storage";
+import type { CupidFilters } from "@/types";
+import { useEffect, useReducer } from "react";
 import { Button } from "./ui/button";
 import { Label } from "./ui/label";
 import { Slider } from "./ui/slider";
 import { Switch } from "./ui/switch";
 import { Textarea } from "./ui/textarea";
-import { storage } from "@/storage";
-import { STORAGE_KEYS } from "@/consts";
-import type { CupidFilters } from "@/types";
 
 // Define action types for reducer
 type ActionType =
@@ -151,13 +150,10 @@ export const FiltersForm = () => {
     try {
       await storage.setItem(STORAGE_KEYS.filters, filtersObject);
       window.close();
-      console.log("Filters saved to storage:", filtersObject);
     } catch (error) {
       console.error("Error saving filters to storage:", error);
     }
   };
-
-  console.log(state.maxDistance);
 
   return (
     <div className="flex flex-col gap-5 text-lg  p-6 font-bold w-full h-full">

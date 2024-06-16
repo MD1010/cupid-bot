@@ -1,9 +1,23 @@
-import { EMPLOYED_STATUSES, FAT_BODY_TYPES, RELIGIOUS_RESERVED_WORDS } from '@/consts';
-import type { CupidFilters, CupidUser, LocationCoordinates, Match, NumericRange } from '@/types';
-import { getDetail, getHeight, hasWords } from '@/utils/filters';
-import { calculateDistanceKm, getCitiesCoordinates, getMyLocationCoords, normalizeLocation } from '@/utils/location';
-import { normalizeString } from '@/utils/string';
-
+import {
+  EMPLOYED_STATUSES,
+  FAT_BODY_TYPES,
+  RELIGIOUS_RESERVED_WORDS,
+} from "@/consts";
+import type {
+  CupidFilters,
+  CupidUser,
+  LocationCoordinates,
+  Match,
+  NumericRange,
+} from "@/types";
+import { getDetail, getHeight, hasWords } from "@/utils/filters";
+import {
+  calculateDistanceKm,
+  getCitiesCoordinates,
+  getMyLocationCoords,
+  normalizeLocation,
+} from "@/utils/location";
+import { normalizeString } from "@/utils/string";
 
 function filterByOrientation(
   user: CupidUser,
@@ -56,8 +70,12 @@ function filterByExcludeWords(
     ...user.essaysWithUniqueIds.map((essay) => essay.processedContent),
   ].join(" ");
 
-  const result = !hasWords(allText, excludeWords);
-  return [result, result ? "" : "Contains excluded words"];
+  const [hasExcludedWords, foundWords] = hasWords(allText, excludeWords);
+  const result = !hasExcludedWords;
+  return [
+    result,
+    result ? "" : `Contains excluded words: ${foundWords.join(", ")}`,
+  ];
 }
 
 function filterByIncludeWords(
@@ -79,7 +97,7 @@ function filterByIncludeWords(
     ...user.essaysWithUniqueIds.map((essay) => essay.processedContent),
   ].join(" ");
 
-  const result = hasWords(allText, includeWords);
+  const [result] = hasWords(allText, includeWords);
   return [result, result ? "" : "Does not contain required words"];
 }
 
@@ -95,26 +113,29 @@ function filterByReligion(
 
 function filterBySmoking(
   user: CupidUser,
-  isSmoking: boolean
+  isNotSmoking: boolean
 ): [boolean, string] {
   const lifestyleDetail = getDetail(user.detailSentences, "lifestyle");
+  console.log("lifestyleDetail");
 
   if (!lifestyleDetail) return [true, ""];
   const result =
-    (lifestyleDetail?.includes("Smokes cigarettes") && isSmoking) ||
-    lifestyleDetail?.includes("Doesn't smoke") ||
-    (!lifestyleDetail?.includes("Smokes cigarettes") && !isSmoking);
+    (lifestyleDetail?.includes("Doesn't smoke") && isNotSmoking) ||
+    (lifestyleDetail?.includes("Smokes cigarettes") && !isNotSmoking) ||
+    (!lifestyleDetail?.includes("Smokes cigarettes") && isNotSmoking);
 
   return [result, result ? "" : "Smoking preference mismatch"];
 }
 
-function filterByWeed(user: CupidUser, isWeed: boolean): [boolean, string] {
+function filterByWeed(user: CupidUser, isNotWeed: boolean): [boolean, string] {
   const lifestyleDetail = getDetail(user.detailSentences, "lifestyle");
   if (!lifestyleDetail) return [true, ""];
+
   const result =
-    (lifestyleDetail?.includes("Smokes marijuana") && isWeed) ||
-    lifestyleDetail?.includes("Never smokes marijuana") ||
-    (!lifestyleDetail?.includes("Smokes marijuana") && !isWeed);
+    (lifestyleDetail?.includes("Never smokes marijuana") && isNotWeed) ||
+    (lifestyleDetail?.includes("Smokes marijuana") && !isNotWeed) ||
+    (!lifestyleDetail?.includes("Smokes marijuana") && isNotWeed);
+
   return [result, result ? "" : "Weed preference mismatch"];
 }
 
@@ -247,6 +268,8 @@ async function filterByPlace(
 
   try {
     const distanceKm = calculateDistanceKm(fromLocationCoords, matchCoords);
+    console.log("distance ", distanceKm, maxDistanceKm);
+
     const result = distanceKm <= maxDistanceKm;
 
     return [result, result ? "" : `Distance mismatch: ${distanceKm} km away`];
@@ -267,7 +290,7 @@ export async function getRelevantMatchesByFilters(
   const coordinatesMap = await getCitiesCoordinates();
   const userCoords = await getMyLocationCoords();
 
-  matches.forEach(async (match) => {
+  for (const match of matches) {
     const user = match.user;
     let isMatch = true;
     const reasonsList: string[] = [];
@@ -391,32 +414,26 @@ export async function getRelevantMatchesByFilters(
       isMatch = isMatch && result;
     }
 
-    if (isMatch) {
-      foundMatches.push(match);
-    } else {
-      reasons[user.id] = reasonsList.join(", ");
-    }
     if (filters.maxDistance) {
       const matchCoords =
         coordinatesMap[
           normalizeLocation(normalizeString(match.user.location.summary))
         ];
 
-      if (!matchCoords) {
-        return foundMatches.push(match);
+      if (!matchCoords) isMatch = true;
+
+      if (matchCoords) {
+        const [result, reason] = await filterByPlace(
+          user,
+          userCoords,
+          matchCoords,
+          filters.maxDistance,
+          passIfNotSpecified
+        );
+
+        if (!result) reasonsList.push(reason);
+        isMatch = isMatch && result;
       }
-      //todo bug that if already filtered one the other one is not filtered
-
-      const [result, reason] = await filterByPlace(
-        user,
-        userCoords,
-        matchCoords,
-        filters.maxDistance,
-        passIfNotSpecified
-      );
-
-      if (!result) reasonsList.push(reason);
-      isMatch = isMatch && result;
     }
 
     if (isMatch) {
@@ -424,7 +441,7 @@ export async function getRelevantMatchesByFilters(
     } else {
       reasons[user.id] = reasonsList.join(", ");
     }
-  });
+  }
 
   return { foundMatches, reasons };
 }

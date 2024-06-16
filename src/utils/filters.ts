@@ -10,9 +10,10 @@ function getHeight(details: DetailSentence[]): number | null {
   return heightStr ? parseInt(heightStr.replace("cm", "").trim()) : null;
 }
 
-function hasWords(content: string, words: string[]): boolean {
+function hasWords(content: string, words: string[]): [boolean, string[]] {
   const lowerCaseContent = content.toLowerCase();
-  return words.some((word) => lowerCaseContent.includes(word.toLowerCase()));
+  const foundWords = words.filter((word) => lowerCaseContent.includes(word.toLowerCase()));
+  return [foundWords.length > 0, foundWords];
 }
 
 export { getDetail, getHeight, hasWords };
