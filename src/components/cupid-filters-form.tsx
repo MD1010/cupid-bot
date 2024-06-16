@@ -160,12 +160,13 @@ export const FiltersForm = () => {
   console.log(state.maxDistance);
 
   return (
-    <div className="flex flex-col gap-5 text-lg text-primary p-6 font-bold w-full h-full">
+    <div className="flex flex-col gap-5 text-lg  p-6 font-bold w-full h-full">
       <h1 className="text-lg text-center">Narrow your search</h1>
 
       <div>
         <Label>Your Message</Label>
         <Textarea
+          className="text-primary"
           value={state.messageToSend}
           onChange={(e) =>
             dispatch({ type: "SET_MESSAGE", payload: e.target.value })
@@ -176,6 +177,7 @@ export const FiltersForm = () => {
       <div>
         <Label>Must include words separated by comma</Label>
         <Textarea
+          className="text-primary"
           value={state.onlyAcceptIfIncludeWords}
           onChange={(e) =>
             dispatch({
@@ -189,6 +191,7 @@ export const FiltersForm = () => {
       <div>
         <Label>Should not include words separated by comma</Label>
         <Textarea
+          className="text-primary"
           value={state.filterIfHasWords}
           onChange={(e) =>
             dispatch({
@@ -242,9 +245,12 @@ export const FiltersForm = () => {
       <div className="flex flex-col justify-between gap-5">
         <div className="flex justify-between">
           <Label>Max Distance</Label>
-          <span className="font-semibold text-sm">{state.maxDistance} km</span>
+          <span className="font-semibold text-sm text-primary">
+            {state.maxDistance} km
+          </span>
         </div>
         <Slider
+          className="cursor-pointer"
           value={[state.maxDistance]}
           defaultValue={[0]}
           step={5}
@@ -258,12 +264,13 @@ export const FiltersForm = () => {
       <div className="flex flex-col justify-between gap-5 py-6">
         <div className="flex justify-between">
           <Label>Height Range</Label>
-          <span className="font-semibold text-sm">
+          <span className="font-semibold text-sm text-primary">
             Between {state.heightRange[0]}cm and {state.heightRange[1]}cm
           </span>
         </div>
 
         <Slider
+          className="cursor-pointer"
           value={state.heightRange}
           min={140}
           step={1}

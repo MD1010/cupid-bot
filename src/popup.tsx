@@ -1,5 +1,7 @@
 import "@/style.css";
 import "../globals.css";
+import "./popupStyle.css"
+
 import { FiltersForm } from "@/components/cupid-filters-form";
 import { Switch } from "./components/ui/switch";
 import { ThemeProvider } from "@/components/theme-provider";
