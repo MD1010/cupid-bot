@@ -116,7 +116,6 @@ function filterBySmoking(
   isNotSmoking: boolean
 ): [boolean, string] {
   const lifestyleDetail = getDetail(user.detailSentences, "lifestyle");
-  console.log("lifestyleDetail");
 
   if (!lifestyleDetail) return [true, ""];
   const result =
@@ -268,7 +267,6 @@ async function filterByPlace(
 
   try {
     const distanceKm = calculateDistanceKm(fromLocationCoords, matchCoords);
-    console.log("distance ", distanceKm, maxDistanceKm);
 
     const result = distanceKm <= maxDistanceKm;
 

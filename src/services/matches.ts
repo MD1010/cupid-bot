@@ -1,13 +1,12 @@
-import { getRemainingLikes, sendUserPass } from '@/api/likes';
-import { sendMessage } from '@/api/message';
-import { STORAGE_KEYS, SLEEP_TIME_BETWEEN_SENDS } from '@/consts';
-import { storage } from '@/storage';
-import type { Match, CupidFilters } from '@/types';
-import { sleep } from '@/utils/time';
+import { getRemainingLikes, sendUserPass } from "@/api/likes";
+import { sendMessage } from "@/api/message";
+import { STORAGE_KEYS, SLEEP_TIME_BETWEEN_SENDS } from "@/consts";
+import { storage } from "@/storage";
+import type { Match, CupidFilters } from "@/types";
+import { sleep } from "@/utils/time";
 import _ from "lodash";
-import { getRelevantMatchesByFilters } from './filters';
-import { getUserInfo } from './user';
-
+import { getRelevantMatchesByFilters } from "./filters";
+import { getUserInfo } from "./user";
 
 const STACKS_TO_IGNORE = ["PENPAL"];
 
@@ -89,7 +88,7 @@ export const sendMessagesToRelevant = async ({
     maxPotentialMatchesToFetch
   );
 
-  console.log("found matches", foundMatches);
+  console.log("found matches");
 
   const { passedMap: passedMatches, reasons } = await filterMatches(
     foundMatches,
@@ -107,13 +106,19 @@ export const sendMessagesToRelevant = async ({
   for (const { user } of foundMatches) {
     if (seenIds.has(user.id)) continue;
     if (passedMatches.get(user.id)) {
-      console.log(`✅ ${user.primaryImage.square400}`, user);
-      // await sendMessage(user.id, messageToSend);
+      console.log(`✅ ${user.primaryImage.square400}`, user.id, user);
+      await sendMessage(user.id, messageToSend);
       numOfSent += 1;
       await storage.setItem(STORAGE_KEYS.sentAmount, numOfSent);
     } else {
-      console.log("❌", user.primaryImage.square400, reasons[user.id], user);
-      // await sendUserPass(user.id, userToStreamMap.get(user.id));
+      console.log(
+        "❌",
+        user.primaryImage.square400,
+        user.id,
+        reasons[user.id],
+        user
+      );
+      await sendUserPass(user.id, userToStreamMap.get(user.id));
     }
     seenIds.add(user.id);
     console.log("💤");
