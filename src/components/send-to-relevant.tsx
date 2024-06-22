@@ -28,8 +28,9 @@ export const SendToRelevant = () => {
         onClick={async () => {
           while (remainingLikes) {
             setIsSendingInProgress(true);
-            await sendMessagesToRelevant(filters);
+            const currentIterationSent = await sendMessagesToRelevant(filters);
             setIsSendingInProgress(false);
+            if(!currentIterationSent) break;
           }
         }}
       >

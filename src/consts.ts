@@ -20,7 +20,8 @@ export const STORAGE_KEYS = {
   currentUserId: "currentUserId",
   foundMatches: "foundMatches",
   sentAmount: "sentAmount",
-  filters: "filters"
+  filters: "filters",
+  sentIds: 'sentIds',
 };
 
 export const DEFAULT_MESSAGE = "היי :)";
