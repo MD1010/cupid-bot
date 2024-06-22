@@ -5,8 +5,7 @@ import { fetchCupidAPI } from "@/utils/cupidRequest";
 const getRemainingLikes = async () => {
   const data = await getUserInfo();
   const likeCap = data.data.user.likesCap.likesRemaining;
-  console.log("like cap", likeCap);
-  
+
   return likeCap;
 };
 
