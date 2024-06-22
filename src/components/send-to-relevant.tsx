@@ -3,7 +3,7 @@ import { sendMessagesToRelevant } from "@/services/matches";
 import { useStorage } from "@plasmohq/storage/hook";
 import { useState } from "react";
 import { Button } from "./ui/button";
-import { sendMessageToTargetId } from '@/services/messages';
+import { sendMessageToTargetId } from "@/services/messages";
 
 export const SendToRelevant = () => {
   const [isSendingInProgress, setIsSendingInProgress] = useState(false);
@@ -11,8 +11,7 @@ export const SendToRelevant = () => {
   const [filters] = useStorage(STORAGE_KEYS.filters);
   const [remainingLikes] = useStorage(STORAGE_KEYS.likes);
 
-  const message2 =
-    "";
+  const message2 = "";
 
   const sendToSpecificId = async () => {
     setIsSendingInProgress(true);
@@ -27,7 +26,7 @@ export const SendToRelevant = () => {
         variant="default"
         isLoading={isSendingInProgress}
         onClick={async () => {
-          for (let i = 0; i < MAX_RETRIES; i++) {
+          while (remainingLikes) {
             setIsSendingInProgress(true);
             await sendMessagesToRelevant(filters);
             setIsSendingInProgress(false);
@@ -40,8 +39,10 @@ export const SendToRelevant = () => {
           ) : (
             `Working on that :)`
           )
+        ) : remainingLikes ? (
+          "Match"
         ) : (
-          remainingLikes ? "Match" : "No likes remaining"
+          "No likes remaining"
         )}
       </Button>
 

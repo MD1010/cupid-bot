@@ -263,6 +263,7 @@ async function filterByPlace(
   passIfNotSpecified: boolean
 ): Promise<[boolean, string]> {
   const matchLocation = user.location.summary;
+  
   if (passIfNotSpecified && !matchLocation) return [true, ""];
 
   try {
@@ -290,6 +291,7 @@ export async function getRelevantMatchesByFilters(
 
   for (const match of matches) {
     const user = match.user;
+    
     let isMatch = true;
     const reasonsList: string[] = [];
 
@@ -413,11 +415,12 @@ export async function getRelevantMatchesByFilters(
     }
 
     if (filters.maxDistance) {
+      
       const matchCoords =
-        coordinatesMap[
-          normalizeLocation(normalizeString(match.user.location.summary))
-        ];
-
+      coordinatesMap[
+        normalizeLocation(normalizeString(match.user.location?.summary))
+      ];
+      
       if (!matchCoords) isMatch = true;
 
       if (matchCoords) {
