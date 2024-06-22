@@ -81,8 +81,6 @@ export const sendMessagesToRelevant = async ({
     ? maxSendTo
     : await getRemainingLikes();
 
-  // const seenIds = new Set();
-
   let numOfSent = 0;
 
   const { foundMatches, userToStreamMap } = await getUserPotentialMatches(
@@ -105,12 +103,17 @@ export const sendMessagesToRelevant = async ({
   await storage.setItem(STORAGE_KEYS.sentAmount, 0);
 
   for (const { user } of foundMatches) {
-    const sentIds = await storage.getItem(STORAGE_KEYS.sentIds) || [];
+    const sentIds = (await storage.getItem(STORAGE_KEYS.sentIds)) || [];
     const sentIdsSet = new Set(sentIds);
-    
+
     if (sentIdsSet.has(user.id)) continue;
     if (passedMatches.get(user.id)) {
-      console.log(`✅ ${user.primaryImage.square400}`, user.id, user);
+      console.log(
+        `id: ${user.id} 
+        ✅ name: ${user.displayname},
+        age: ${user.age},
+        photos:\n${user.photos.map((photo) => photo.square400).join("\n")}`
+      );
       await sendMessage(user.id, messageToSend);
       numOfSent += 1;
       await storage.setItem(STORAGE_KEYS.sentIds, [...sentIds, user.id]);
@@ -118,10 +121,9 @@ export const sendMessagesToRelevant = async ({
     } else {
       console.log(
         "❌",
-        user.primaryImage.square400,
-        user.id,
-        reasons[user.id],
-        user
+        `photos:\n${user.photos.map((photo) => photo.square400).join("\n")}`,
+        `id: ${user.id}`,
+        `reasons: ${reasons[user.id]}`
       );
       await sendUserPass(user.id, userToStreamMap.get(user.id));
     }

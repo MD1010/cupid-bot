@@ -27,10 +27,11 @@ export const SendToRelevant = () => {
         isLoading={isSendingInProgress}
         onClick={async () => {
           while (remainingLikes) {
+            console.log("continue in loop remaining likes = ", remainingLikes);
             setIsSendingInProgress(true);
             const currentIterationSent = await sendMessagesToRelevant(filters);
             setIsSendingInProgress(false);
-            if(!currentIterationSent) break;
+            if (!currentIterationSent) break;
           }
         }}
       >
