@@ -263,7 +263,7 @@ async function filterByPlace(
   passIfNotSpecified: boolean
 ): Promise<[boolean, string]> {
   const matchLocation = user.location.summary;
-  
+
   if (passIfNotSpecified && !matchLocation) return [true, ""];
 
   try {
@@ -286,14 +286,17 @@ export async function getRelevantMatchesByFilters(
   const foundMatches: Match[] = [];
   const reasons: Record<string, string> = {};
 
+  const validMatches = matches.filter(match => !!match.user.age) // remove invalid users
+
   const coordinatesMap = await getCitiesCoordinates();
   const userCoords = await getMyLocationCoords();
 
-  for (const match of matches) {
+  for (const match of validMatches) {
     const user = match.user;
-    
+
     let isMatch = true;
     const reasonsList: string[] = [];
+
 
     if (filters.isStraight !== undefined) {
       const [result, reason] = filterByOrientation(
@@ -415,12 +418,11 @@ export async function getRelevantMatchesByFilters(
     }
 
     if (filters.maxDistance) {
-      
       const matchCoords =
-      coordinatesMap[
-        normalizeLocation(normalizeString(match.user.location?.summary))
-      ];
-      
+        coordinatesMap[
+          normalizeLocation(normalizeString(match.user.location?.summary))
+        ];
+
       if (!matchCoords) isMatch = true;
 
       if (matchCoords) {
