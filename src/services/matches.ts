@@ -111,6 +111,7 @@ export const sendMessagesToRelevant = async ({
       console.log(
         `id: ${user.id} 
         ✅ name: ${user.displayname},
+        from: ${user.location.summary},
         age: ${user.age},
         photos:\n${user.photos.map((photo) => photo.square400).join("\n")}`
       );
