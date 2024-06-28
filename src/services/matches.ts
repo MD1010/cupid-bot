@@ -1,8 +1,8 @@
-import { getRemainingLikes, sendUserPass } from "@/api/likes";
-import { sendMessage } from "@/api/message";
-import { STORAGE_KEYS, SLEEP_TIME_BETWEEN_SENDS } from "@/consts";
+import { getRemainingLikes } from "@/api/likes";
+import { SLEEP_TIME_BETWEEN_SENDS, STORAGE_KEYS } from "@/consts";
+import { checkIfSentIdExists, saveSentId } from '@/lib/db';
 import { storage } from "@/storage";
-import type { Match, CupidFilters } from "@/types";
+import type { CupidFilters, Match } from "@/types";
 import { sleep } from "@/utils/time";
 import _ from "lodash";
 import { getRelevantMatchesByFilters } from "./filters";
@@ -103,35 +103,34 @@ export const sendMessagesToRelevant = async ({
   await storage.setItem(STORAGE_KEYS.sentAmount, 0);
 
   for (const { user } of foundMatches) {
-    const sentIds = (await storage.getItem(STORAGE_KEYS.sentIds)) || [];
-    const sentIdsSet = new Set(sentIds);
-
-    if (sentIdsSet.has(user.id)) continue;
+   
+    const idSent = await checkIfSentIdExists(user.id);
+    if (idSent) continue;
     if (passedMatches.get(user.id)) {
       console.log(
         `id: ${user.id} 
         ✅ name: ${user.displayname},
         from: ${user.location.summary},
         age: ${user.age},
-        photos:\n${user.photos.map((photo) => photo.square400).join("\n")}`
+        photos:\n${user.photos.map((photo) => photo.square400).join("\n")}`,
       );
-      await sendMessage(user.id, messageToSend);
+      // await sendMessage(user.id, messageToSend);
       numOfSent += 1;
-      await storage.setItem(STORAGE_KEYS.sentIds, [...sentIds, user.id]);
+      await saveSentId(user.id);
       await storage.setItem(STORAGE_KEYS.sentAmount, numOfSent);
     } else {
       console.log(
         "❌",
         `photos:\n${user.photos.map((photo) => photo.square400).join("\n")}`,
         `id: ${user.id}`,
-        `reasons: ${reasons[user.id]}`
+        `reasons: ${reasons[user.id]}`,
       );
-      await sendUserPass(user.id, userToStreamMap.get(user.id));
+      // await sendUserPass(user.id, userToStreamMap.get(user.id));
     }
     console.log("💤");
 
     await sleep(SLEEP_TIME_BETWEEN_SENDS);
   }
-  console.log(`DONE sent to ${passedMatches.size} new matches`);
+  console.log(`DONE sent to ${numOfSent} new matches`);
   return numOfSent;
 };

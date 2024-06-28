@@ -286,7 +286,7 @@ export async function getRelevantMatchesByFilters(
   const foundMatches: Match[] = [];
   const reasons: Record<string, string> = {};
 
-  const validMatches = matches.filter(match => !!match.user.age) // remove invalid users
+  const validMatches = matches.filter((match) => !!match.user.age); // remove invalid users
 
   const coordinatesMap = await getCitiesCoordinates();
   const userCoords = await getMyLocationCoords();
@@ -296,7 +296,6 @@ export async function getRelevantMatchesByFilters(
 
     let isMatch = true;
     const reasonsList: string[] = [];
-
 
     if (filters.isStraight !== undefined) {
       const [result, reason] = filterByOrientation(
@@ -422,8 +421,6 @@ export async function getRelevantMatchesByFilters(
         coordinatesMap[
           normalizeLocation(normalizeString(match.user.location?.summary))
         ];
-
-      if (!matchCoords) isMatch = true;
 
       if (matchCoords) {
         const [result, reason] = await filterByPlace(
