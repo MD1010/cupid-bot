@@ -44,27 +44,25 @@ async function saveSentId(id: string): Promise<void> {
   });
 }
 
-
 async function checkIfSentIdExists(id: string): Promise<boolean> {
-    const db = await openDatabase();
-  
-    return new Promise((resolve, reject) => {
-      const transaction = db.transaction(['sentIds'], 'readonly');
-      const objectStore = transaction.objectStore('sentIds');
-      const request = objectStore.get(id);
-  
-      request.onsuccess = () => {
-        const result = request.result as SentId | undefined;
-        resolve(!!result);
-      };
-  
-      request.onerror = (event: Event) => {
-        const error = (event.target as IDBRequest).error;
-        console.error('Error checking sent ID:', error);
-        reject(error);
-      };
-    });
-  }
-  
+  const db = await openDatabase();
+
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction(["sentIds"], "readonly");
+    const objectStore = transaction.objectStore("sentIds");
+    const request = objectStore.get(id);
+
+    request.onsuccess = () => {
+      const result = request.result as SentId | undefined;
+      resolve(!!result);
+    };
+
+    request.onerror = (event: Event) => {
+      const error = (event.target as IDBRequest).error;
+      console.error("Error checking sent ID:", error);
+      reject(error);
+    };
+  });
+}
 
 export { openDatabase, saveSentId, checkIfSentIdExists };

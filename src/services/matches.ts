@@ -1,4 +1,4 @@
-import { getRemainingLikes } from "@/api/likes";
+import { getRemainingLikes, sendUserPass } from "@/api/likes";
 import { SLEEP_TIME_BETWEEN_SENDS, STORAGE_KEYS } from "@/consts";
 import { checkIfSentIdExists, saveSentId } from '@/lib/db';
 import { storage } from "@/storage";
@@ -7,6 +7,7 @@ import { sleep } from "@/utils/time";
 import _ from "lodash";
 import { getRelevantMatchesByFilters } from "./filters";
 import { getUserInfo } from "./user";
+import { sendMessage } from '@/api/message';
 
 const STACKS_TO_IGNORE = ["PENPAL"];
 
@@ -114,7 +115,7 @@ export const sendMessagesToRelevant = async ({
         age: ${user.age},
         photos:\n${user.photos.map((photo) => photo.square400).join("\n")}`,
       );
-      // await sendMessage(user.id, messageToSend);
+      await sendMessage(user.id, messageToSend);
       numOfSent += 1;
       await saveSentId(user.id);
       await storage.setItem(STORAGE_KEYS.sentAmount, numOfSent);
@@ -125,7 +126,7 @@ export const sendMessagesToRelevant = async ({
         `id: ${user.id}`,
         `reasons: ${reasons[user.id]}`,
       );
-      // await sendUserPass(user.id, userToStreamMap.get(user.id));
+      await sendUserPass(user.id, userToStreamMap.get(user.id));
     }
     console.log("💤");
 
